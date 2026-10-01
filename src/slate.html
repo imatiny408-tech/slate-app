@@ -3031,14 +3031,14 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   }
   const snapHash = () => hashStr(JSON.stringify(snapshot()));
   // Usernames are stored as a placeholder address, since accounts need one; no email is ever sent there
-  const USER_DOMAIN = "@slate.example.com";
+  const USER_DOMAIN = "@users.imatiny408-tech.github.io", OLD_DOMAIN = "@slate.example.com";
   function authEmail(name) {
     const u = name.trim().toLowerCase();
     if (u.includes("@")) return u;
     if (!/^[a-z0-9._]{3,20}$/.test(u)) return null;
     return u + USER_DOMAIN;
   }
-  const displayName = e => (session && session.username) || ((e || "").endsWith(USER_DOMAIN) ? e.slice(0, -USER_DOMAIN.length) : (e || ""));
+  const displayName = e => (session && session.username) || ((e || "").endsWith(USER_DOMAIN) ? e.slice(0, -USER_DOMAIN.length) : (e || "").endsWith(OLD_DOMAIN) ? e.slice(0, -OLD_DOMAIN.length) : (e || ""));
   // Usernames can change, so look up the account's sign-in address first
   async function resolveLogin(name) {
     const u = name.trim().toLowerCase();
@@ -3061,7 +3061,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (/NotAllowedError|AbortError|cancel/i.test(m)) return "The passkey prompt was closed before it finished.";
     if (/user_banned|banned/i.test(m)) return "This account is locked after 5 wrong passwords. Use Forgot password? to unlock it.";
     if (/password.*(6|characters|short)/i.test(m)) return "Use a password with at least 6 characters.";
-    if (/valid email|invalid.*email/i.test(m)) return "That email address doesn't look right.";
+    if (/email_address_invalid|valid email|invalid.*email/i.test(m)) return "Slate couldn't make an account with that username. Try a different one (letters, numbers, dots and underscores).";
     if (/rate limit|too many/i.test(m)) return "Too many tries for now. Wait a few minutes and try again.";
     if (/failed to fetch|network/i.test(m)) return "Slate can't reach the internet right now. Try again when you're online.";
     return m || "Something went wrong. Try again.";
