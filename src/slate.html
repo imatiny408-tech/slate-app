@@ -428,7 +428,13 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .hw-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 12px; }
 .hw-form input { height: 44px; border: 0; border-radius: 22px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; min-width: 0; box-sizing: border-box; }
 .hw-form input::placeholder { color: var(--muted); }
-.hw-form #hwDue { color: var(--muted); }
+.hw-form select { height: 44px; border: 0; border-radius: 22px; background-color: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 40px 0 16px; outline: none; min-width: 0; box-sizing: border-box; -webkit-appearance: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238e8e93' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; }
+.hw-form select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.hw-newsub { grid-column: 1 / -1; display: flex; gap: 8px; }
+.hw-newsub input { flex: 1; }
+.hw-newsub button { background: var(--bg); color: var(--ink); }
 .hw-form button, .kc-add button { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--ink); color: var(--bg); font-size: 15px; }
 .kc-add { display: flex; gap: 8px; margin-top: 12px; }
 .kc-add input { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 22px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; }
@@ -2262,12 +2268,14 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const dowOf = d => (d.getDay() + 6) % 7;
   const CADENCE = { week: "Every week", "2weeks": "Every other week", month: "Every month" };
+  const SUBJECTS = ["Math", "Reading", "Writing", "Science", "Social Studies", "Spelling", "Art", "Music"];
   function kidsData() {
     if (!store.__kids || typeof store.__kids !== "object") store.__kids = {};
     const k = store.__kids;
     if (k.mode !== "parent") k.mode = "kid";
     k.parent ||= {}; k.parent.kids ||= [];
     k.kid ||= {}; k.kid.chores ||= []; k.kid.done ||= {}; k.kid.homework ||= [];
+    if (!Array.isArray(k.kid.subjects)) k.kid.subjects = SUBJECTS.slice();
     return k;
   }
   kidsData();
@@ -2357,18 +2365,34 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       <div class="h-card kc-card">
         <div class="h-label"><span>Homework</span><span id="hwCount"></span></div>
         <div class="hw-form">
-          <input id="hwSubject" type="text" placeholder="Subject" aria-label="Subject" maxlength="30">
-          <input id="hwDue" type="date" aria-label="Due date">
-          <input id="hwText" type="text" placeholder="What do you have to do?" aria-label="Homework" enterkeyhint="done">
+          <select id="hwSubject" aria-label="Subject"></select>
+          <select id="hwDue" aria-label="Due"></select>
+          <div class="hw-newsub" id="hwNewSub" hidden><input id="hwSubName" type="text" placeholder="New subject" aria-label="New subject" maxlength="24" enterkeyhint="done"><button type="button" id="hwSubSave">Add subject</button></div>
+          <input id="hwText" type="text" placeholder="Assignment" aria-label="Assignment" enterkeyhint="done">
           <button type="button" id="hwAdd">Add</button>
         </div>
         <div class="kc-list" id="hwList"></div>
       </div>`;
     $("getChores").addEventListener("click", () => openImport(""));
     renderWeekStrip(); renderKidChores(); renderHomework();
+    fillSubjects(c.lastSubject); fillDueDays();
+    $("hwSubject").addEventListener("change", () => {
+      if ($("hwSubject").value === "__add") {
+        $("hwNewSub").hidden = false; $("hwSubName").value = ""; setTimeout(() => $("hwSubName").focus(), 30);
+        fillSubjects(c.lastSubject);
+      } else { c.lastSubject = $("hwSubject").value; save(); }
+    });
+    const addSubject = () => {
+      const name = $("hwSubName").value.trim(); if (!name) { $("hwSubName").focus(); return; }
+      if (!c.subjects.some(x => x.toLowerCase() === name.toLowerCase())) c.subjects.push(name);
+      c.lastSubject = c.subjects.find(x => x.toLowerCase() === name.toLowerCase()); save();
+      $("hwNewSub").hidden = true; fillSubjects(c.lastSubject); $("hwText").focus();
+    };
+    $("hwSubSave").addEventListener("click", addSubject);
+    $("hwSubName").addEventListener("keydown", e => { if (e.key === "Enter") addSubject(); if (e.key === "Escape") $("hwNewSub").hidden = true; });
     const add = () => {
       const text = $("hwText").value.trim(); if (!text) { $("hwText").focus(); return; }
-      c.homework.push({ id: uid(), subject: $("hwSubject").value.trim(), text, due: $("hwDue").value || "", done: false });
+      c.homework.push({ id: uid(), subject: $("hwSubject").value === "__add" ? "" : $("hwSubject").value, text, due: $("hwDue").value || "", done: false });
       save(); $("hwText").value = ""; renderHomework(true); $("hwText").focus();
     };
     $("hwAdd").addEventListener("click", add);
@@ -2418,12 +2442,29 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (animate) staggerIn(list.children, 1, 0);
     watchFade(list);
   }
+  function fillSubjects(selected) {
+    const c = kidsData().kid, sel = $("hwSubject");
+    sel.innerHTML = c.subjects.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("") + `<option value="__add">＋ Add subject</option>`;
+    sel.value = c.subjects.includes(selected) ? selected : c.subjects[0];
+  }
+  // Today, Tomorrow, then each remaining day by name through the next Monday
+  function fillDueDays() {
+    const sel = $("hwDue"), opts = [];
+    for (let i = 0; i < 8; i++) {
+      const d = addDays(today, i);
+      opts.push(`<option value="${keyOf(d)}">${i === 0 ? "Today" : i === 1 ? "Tomorrow" : DAYS[d.getDay()]}</option>`);
+      if (i > 0 && d.getDay() === 1) break;
+    }
+    sel.innerHTML = opts.join("");
+    sel.value = keyOf(today);
+  }
   function dueLabel(due) {
     if (!due) return "";
     const d = dateOf(due), diff = Math.round((d - today) / 864e5);
     if (diff < 0) return "Overdue";
     if (diff === 0) return "Due today";
     if (diff === 1) return "Due tomorrow";
+    if (diff < 7) return "Due " + DAYS[d.getDay()];
     return "Due " + DAYS[d.getDay()].slice(0, 3) + ", " + shortDate(d);
   }
   function renderHomework(animateFirst) {
