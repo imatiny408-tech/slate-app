@@ -811,8 +811,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 </div>
 <div class="sheet-wrap" id="recSheet">
   <div class="sheet">
-    <h2>Reset your password</h2>
-    <p class="feel-hint">Answer your questions exactly as you did when you made your account.</p>
+    <h2 id="recTitle">Reset your password</h2>
+    <p class="feel-hint" id="recHint">Answer your questions exactly as you did when you made your account.</p>
     <input class="acct-in" id="recUser" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
     <div class="rq" id="recQ">
           <div class="seg seg-wide rq-kind" id="recKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
@@ -3076,7 +3076,18 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     const btn = $("acctGo"); btn.disabled = true; acctStatus(acctMode === "in" ? "Signing in…" : "Creating your account…");
     try {
       if (acctMode === "in") {
-        setSession(await sbAuth("token?grant_type=password", { email, password }));
+        try { setSession(await sbAuth("token?grant_type=password", { email, password })); }
+        catch (e) {
+          if (/banned/i.test(String(e && e.msg))) { showLocked(); btn.disabled = false; return; }
+          if (/invalid login/i.test(String(e && e.msg))) {
+            let g = null; try { g = await rpc("signin_failed", { p_email: email }); } catch (e3) {}
+            if (g && g.locked) { showLocked(); btn.disabled = false; return; }
+            acctStatus("That username and password don't match." + (g && g.left ? ` ${g.left} ${g.left === 1 ? "try" : "tries"} left before your account locks.` : ""));
+            btn.disabled = false; return;
+          }
+          throw e;
+        }
+        rpc("signin_succeeded", {}, true).catch(() => {});
         $("acctPass").value = ""; acctStatus(""); refreshRecStatus();
         await syncNow(true);
       } else {
@@ -3092,7 +3103,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   };
   $("acctGo").addEventListener("click", acctSubmit);
   $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
-  $("acctForgot").addEventListener("click", openReset);
+  $("acctForgot").addEventListener("click", () => openReset(false));
   $("acctRecRow").addEventListener("click", openRecSet);
 
   // ---- security questions: kids answer name, birthday and a parent's name; adults name, birthday and an email ----
@@ -3134,7 +3145,16 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (!session) return;
     try { const k = await rpc("has_recovery_answers", {}, true); $("acctRecVal").textContent = k ? "Set" : "Set up"; } catch (e) {}
   }
-  function openReset() {
+  // 5 wrong passwords lock the account; answering the questions unlocks it
+  function showLocked() {
+    acctStatus("This account is locked after 5 wrong passwords. Answer your questions to unlock it.");
+    setTimeout(() => openReset(true), 900);
+  }
+  function openReset(locked) {
+    $("recTitle").textContent = locked === true ? "Unlock your account" : "Reset your password";
+    $("recHint").textContent = locked === true
+      ? "This account was locked after 5 wrong passwords. Answer your questions exactly as you did when you made it, then choose a new password."
+      : "Answer your questions exactly as you did when you made your account.";
     $("recUser").value = $("acctEmail2").value.trim(); recQ.clear(); $("recPw").value = ""; $("recStatus").textContent = ""; $("recStatus").classList.remove("ok");
     $("acctSheet").classList.remove("open"); $("recSheet").classList.add("open");
     setTimeout(() => ($("recUser").value ? recQ.focus("First") : $("recUser").focus()), 300);
@@ -3151,8 +3171,9 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       if (res === "ok") {
         setSession(await sbAuth("token?grant_type=password", { email, password: pw }));
         $("recSheet").classList.remove("open"); showToast({ text: "Your new password is saved, and you're signed in." });
+        rpc("signin_succeeded", {}, true).catch(() => {});
         syncNow(true);
-      } else if (res === "locked") st("Too many tries. Wait 15 minutes, then try again.");
+      } else if (res === "locked") st("Too many wrong answers. Wait 15 minutes, then try again.");
       else if (res === "short") st("Choose a new password with at least 6 characters.");
       else st("Those answers don't match what's on file. Check the spelling and the birthday, then try again.");
     } catch (e) { st(friendly(e)); }
