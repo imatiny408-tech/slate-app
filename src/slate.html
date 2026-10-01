@@ -1424,7 +1424,20 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (t === "System") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", t.toLowerCase());
     $("themeVal").textContent = t;
+    syncStatusBar();
   };
+  // The installed app's status bar takes this color, so it always matches the screen
+  function syncStatusBar() {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#f2f2f2";
+    let m = document.getElementById("themeColor");
+    if (!m) {
+      document.querySelectorAll('meta[name="theme-color"]').forEach(x => x.remove());
+      m = document.createElement("meta"); m.name = "theme-color"; m.id = "themeColor";
+      document.head.appendChild(m);
+    }
+    m.content = bg;
+  }
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncStatusBar); } catch (e) {}
   applyTheme();
   $("themeOpt").addEventListener("click", () => {
     themeIdx = (themeIdx + 1) % 3; applyTheme();
