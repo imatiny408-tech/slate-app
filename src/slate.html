@@ -333,6 +333,16 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .cp-bar .cp-knob { top: 50%; }
 .cp-row { display: flex; align-items: center; gap: 10px; }
 .cp-sw { width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto; box-shadow: inset 0 0 0 1px var(--line); }
+.cp-saved-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-top: 2px; }
+.cp-saved { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; min-height: 34px; }
+.cp-swatch, .cp-add { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; }
+.cp-swatch { background-color: #fff; background-image: linear-gradient(var(--c), var(--c)), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 100% 100%, 10px 10px, 10px 10px; background-position: 0 0, 0 0, 5px 5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+.cp-swatch.editing { animation: jiggle .3s ease-in-out infinite alternate; }
+.cp-swatch svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 2px rgba(0,0,0,.6)); }
+@keyframes jiggle { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.cp-add { box-shadow: inset 0 0 0 1.5px var(--soft); color: var(--muted); }
+.cp-add svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.cp-tip { color: var(--muted); font-size: 13px; }
 .cp-hex { flex: 1; min-width: 0; height: 40px; border: 0; border-radius: 12px; background: var(--bg); color: var(--ink); font: 15px ui-monospace, Menlo, monospace; padding: 0 12px; outline: none; text-transform: uppercase; box-sizing: border-box; }
 
 /* Accents side panel */
@@ -1132,7 +1142,9 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     host.innerHTML = `<div class="cp-sv" aria-label="Saturation and brightness"><i class="cp-knob"></i></div>
       <div class="cp-bar cp-hue" aria-label="Hue"><i class="cp-knob"></i></div>
       <div class="cp-bar cp-alpha" aria-label="Opacity"><div class="fill"></div><i class="cp-knob"></i></div>
-      <div class="cp-row"><span class="cp-sw"></span><input class="cp-hex" type="text" maxlength="9" spellcheck="false" aria-label="Hex color"></div>`;
+      <div class="cp-row"><span class="cp-sw"></span><input class="cp-hex" type="text" maxlength="9" spellcheck="false" aria-label="Hex color"></div>
+      <div class="cp-saved-head"><span>Saved colors</span><button type="button" class="link cp-edit">Edit</button></div>
+      <div class="cp-saved"></div>`;
     const sv = host.querySelector(".cp-sv"), hue = host.querySelector(".cp-hue"), alpha = host.querySelector(".cp-alpha");
     const hexIn = host.querySelector(".cp-hex"), sw = host.querySelector(".cp-sw");
     let h = 0, sa = 1, va = 1, a = 1;
@@ -1163,8 +1175,51 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     drag(alpha, x => { a = Math.round(x * 100) / 100; });
     hexIn.addEventListener("input", () => { const p = parseHex(hexIn.value); if (!p) return; [h, sa, va] = rgbToHsv(p[0], p[1], p[2]); a = p[3]; paint(true); emit(); });
     hexIn.addEventListener("blur", () => paint());
+    const savedRow = host.querySelector(".cp-saved"), editBtn = host.querySelector(".cp-edit");
+    let editing = false;
+    function renderSaved() {
+      savedRow.replaceChildren();
+      savedColors.forEach((c, i) => {
+        const b = document.createElement("button"); b.type = "button"; b.className = "cp-swatch" + (editing ? " editing" : "");
+        b.style.setProperty("--c", c); b.setAttribute("aria-label", (editing ? "Remove saved color " : "Use saved color ") + c);
+        if (editing) b.innerHTML = X_ICON;
+        b.addEventListener("click", () => {
+          if (editing) { savedColors.splice(i, 1); storeColors(); return; }
+          set(c); emit();
+          b.animate([{ transform: "scale(.85)" }, { transform: "none" }], { duration: 260, easing: EASE });
+        });
+        savedRow.appendChild(b);
+      });
+      if (!editing) {
+        const add = document.createElement("button"); add.type = "button"; add.className = "cp-add";
+        add.setAttribute("aria-label", "Save this color"); add.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>';
+        add.addEventListener("click", () => {
+          const c = hex().toLowerCase();
+          if (!savedColors.includes(c)) { savedColors.push(c); storeColors(); }
+          savedRow.lastElementChild?.previousElementSibling?.animate([{ transform: "scale(.5)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 320, easing: EASE });
+        });
+        savedRow.appendChild(add);
+      }
+      if (!savedColors.length && !editing) {
+        const tip = document.createElement("span"); tip.className = "cp-tip"; tip.textContent = "Tap + to save the color you've picked.";
+        savedRow.appendChild(tip);
+      }
+      editBtn.hidden = !savedColors.length && !editing;
+      editBtn.textContent = editing ? "Done" : "Edit";
+    }
+    editBtn.addEventListener("click", () => { editing = !editing; renderSaved(); });
+    pickerRows.push(() => { if (!savedColors.length) editing = false; renderSaved(); });
     set(initial);
+    renderSaved();
     return { set, get: hex };
+  }
+  // Saved colors are shared by every color picker in the app
+  var savedColors = [];
+  try { savedColors = JSON.parse(localStorage.getItem("slate.colors") || "[]") || []; } catch (e) { savedColors = []; }
+  var pickerRows = [];
+  function storeColors() {
+    try { localStorage.setItem("slate.colors", JSON.stringify(savedColors)); } catch (e) {}
+    pickerRows.forEach(f => f());
   }
 
   // ---------- accents ----------
@@ -2056,7 +2111,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   }
 
   // ---------- back up / restore ----------
-  const LS_KEYS = ["slate.avatar", "slate.theme", "slate.style", "slate.accents", "slate.cal", "slate.view"];
+  const LS_KEYS = ["slate.avatar", "slate.theme", "slate.style", "slate.accents", "slate.colors", "slate.cal", "slate.view"];
   function backupText() {
     const extra = {};
     LS_KEYS.forEach(k => { try { const v = localStorage.getItem(k); if (v != null) extra[k] = v; } catch (e) {} });
