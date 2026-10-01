@@ -53,6 +53,7 @@ html { box-sizing: border-box; overflow: hidden; overscroll-behavior: none; }
   font-family: var(--display); font-weight: 700; letter-spacing: -.035em;
 }
 [data-style="editorial"] .numeral { letter-spacing: -.06em; }
+[data-style="editorial"] .month-foot { text-transform: none; letter-spacing: .01em; font-weight: 600; }
 [data-style="editorial"] .label, [data-style="editorial"] .wk-day, [data-style="editorial"] .splash-day,
 [data-style="editorial"] .splash-date, [data-style="editorial"] .m-num, [data-style="editorial"] .bk-h { font-weight: 600; letter-spacing: -.01em; }
 [data-style="editorial"] .row .text, [data-style="editorial"] .routine, [data-style="editorial"] .chip,
@@ -298,6 +299,68 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .md-add { margin-top: 14px; }
 .md-btns { margin-top: 14px; }
 
+/* Month cells: two tasks, then View more */
+.m-chip { display: flex; align-items: center; gap: 6px; }
+.m-chip .cd, .dd-item .cd, .cat-chip .cd { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+.m-chip .tx { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.m-more { font-size: 12px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; padding: 2px 0 0 8px; }
+
+/* Categories */
+.cat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.cat-chip { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px; border-radius: 17px; background: var(--bg); font-size: 14px; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .2s ease; }
+.cat-chip[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.cat-chip .rmc { margin-right: -6px; width: 22px; height: 22px; display: grid; place-items: center; color: var(--muted); border-radius: 50%; }
+.cat-chip .rmc svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+.cat-chip.add { color: var(--muted); }
+.cat-new { margin-top: 14px; padding: 16px; border-radius: 22px; background: var(--bg); }
+.cat-new input { width: 100%; box-sizing: border-box; height: 44px; border: 0; border-radius: 22px; background: var(--card); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; margin-bottom: 14px; }
+.cat-new .confirm-btns { margin-top: 14px; }
+.cat-new .confirm-btns button { background: var(--card); }
+.cat-new .confirm-btns .ink { background: var(--ink); color: var(--bg); }
+.dd-item .catp { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); padding: 5px 10px; border-radius: 999px; background: var(--bg); flex: 0 0 auto; }
+#mdSheet .sheet { overflow-y: auto; scrollbar-width: none; }
+
+/* Color picker */
+.cp { display: grid; gap: 12px; }
+.cp-sv { position: relative; height: 190px; border-radius: 16px; touch-action: none; cursor: crosshair; overflow: hidden; }
+.cp-sv::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
+.cp-sv::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
+.cp-bar { position: relative; height: 22px; border-radius: 11px; touch-action: none; cursor: pointer; }
+.cp-hue { background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); }
+.cp-alpha { background-color: #fff; background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 12px 12px; background-position: 0 0, 6px 6px; }
+.cp-alpha .fill { position: absolute; inset: 0; border-radius: 11px; }
+.cp-knob { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; box-shadow: 0 0 0 3px #fff, 0 1px 6px rgba(0,0,0,.35); pointer-events: none; z-index: 1; }
+.cp-bar .cp-knob { top: 50%; }
+.cp-row { display: flex; align-items: center; gap: 10px; }
+.cp-sw { width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto; box-shadow: inset 0 0 0 1px var(--line); }
+.cp-hex { flex: 1; min-width: 0; height: 40px; border: 0; border-radius: 12px; background: var(--bg); color: var(--ink); font: 15px ui-monospace, Menlo, monospace; padding: 0 12px; outline: none; text-transform: uppercase; box-sizing: border-box; }
+
+/* Accents side panel */
+.side-panel { position: fixed; top: 0; right: 0; bottom: 0; z-index: 22; width: min(440px, 100%); box-sizing: border-box; background: var(--card); box-shadow: -20px 0 60px var(--shadow); padding: calc(env(safe-area-inset-top, 0px) + 22px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px); display: flex; flex-direction: column; transform: translateX(105%); transition: transform .55s var(--ease); overflow-y: auto; scrollbar-width: none; touch-action: pan-y; }
+.side-panel:not(.open) { visibility: hidden; box-shadow: none; transition: transform .55s var(--ease), visibility 0s linear .55s, box-shadow .3s ease; }
+.side-panel.open { transform: none; visibility: visible; }
+.acc-head { display: flex; align-items: center; justify-content: space-between; }
+.acc-head h2 { font-weight: 400; font-size: 34px; margin: 0; }
+.acc-done { padding: 10px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 15px; }
+.acc-hint { color: var(--muted); font-size: 15px; line-height: 1.4; margin: 10px 0 14px; }
+.acc-list { display: flex; flex-direction: column; }
+.acc-item { display: flex; align-items: center; gap: 12px; padding-block: 11px; border-top: 1.5px solid var(--line); font-size: 16px; text-align: left; width: 100%; }
+.acc-item .nm { flex: 1; min-width: 0; text-align: left; font-size: 16px; padding-block: 4px; }
+.acc-item.sel .nm { font-weight: 600; }
+.acc-item .sw { width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line); flex: 0 0 auto; }
+.acc-item .sw.off { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--line) 5px 6px); }
+.tgl { width: 46px; height: 28px; border-radius: 14px; background: var(--soft); position: relative; flex: 0 0 auto; transition: background .25s ease; }
+.tgl::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .25s var(--ease); }
+.tgl.on { background: var(--green); }
+.tgl.on::after { transform: translateX(18px); }
+.acc-edit { margin-top: 14px; padding: 16px; border-radius: 22px; background: var(--bg); }
+.acc-edit .cp-hex { background: var(--card); }
+.acc-edit-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 16px; font-weight: 600; }
+
+/* Month and year at the bottom of the big-date calendar */
+.month-foot { display: none; position: fixed; left: clamp(16px, 3vw, 40px); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); pointer-events: none; transition: opacity .4s ease; }
+#app:not(.b):not(.week):not(.month):not(.home) ~ .month-foot { display: block; }
+
 /* ---------- Home ---------- */
 .home-pane { display: none; }
 #app.home main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "home"; }
@@ -506,6 +569,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <button class="opt" id="themeOpt"><span>Appearance</span><span id="themeVal" style="color:var(--muted)">System</span></button>
     <button class="opt" id="styleOpt"><span>Style</span><span id="styleVal" style="color:var(--muted)">Classic</span></button>
     <button class="opt" id="clearOpt"><span>Clear this day</span><span style="color:var(--muted)">›</span></button>
+    <button class="opt" id="accentsOpt"><span>Accents</span><span style="color:var(--muted)">›</span></button>
     <button class="opt" id="backupOpt"><span>Back up or restore data</span><span style="color:var(--muted)">›</span></button>
     <button class="close" data-close>Done</button>
   </div>
@@ -535,6 +599,12 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <div class="dd-sub" id="mdSub"></div>
     <div class="md-list" id="mdList"></div>
     <div class="idea-add md-add"><input id="mdInput" type="text" placeholder="Add to this day…" aria-label="Add a task to this day" enterkeyhint="done"><button type="button" id="mdAdd">Add</button></div>
+    <div class="cat-row" id="mdCats" role="radiogroup" aria-label="Category"></div>
+    <div class="cat-new" id="catNew" hidden>
+      <input id="catName" type="text" placeholder="Category name, like Work or Family" aria-label="New category name" maxlength="24" enterkeyhint="done">
+      <div class="cp" id="catPicker"></div>
+      <div class="confirm-btns"><button type="button" id="catCancel">Cancel</button><button type="button" class="ink" id="catSave">Add category</button></div>
+    </div>
     <div class="confirm-btns md-btns">
       <button type="button" id="mdOpen">Open day</button>
       <button type="button" class="ink" data-close>Done</button>
@@ -565,6 +635,19 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   <div class="idea-add ip-add"><input id="ideaInput2" type="text" placeholder="Jot down an idea…" aria-label="New idea" enterkeyhint="done"><button type="button" id="ideaAdd2">Pin it</button></div>
   <div class="ip-grid" id="ideasGrid"></div>
 </div>
+<div class="side-panel" id="accPage" aria-hidden="true" role="dialog" aria-label="Accents">
+  <div class="acc-head">
+    <h2>Accents</h2>
+    <button type="button" class="acc-done" id="accDone">Done</button>
+  </div>
+  <p class="acc-hint">Turn on an accent for any area, then pick its color. Changes show on the screen right away.</p>
+  <div class="acc-list" id="accList"></div>
+  <div class="acc-edit" id="accEdit" hidden>
+    <div class="acc-edit-head"><span id="accEditName"></span><button type="button" class="link" id="accReset">Turn off</button></div>
+    <div class="cp" id="accPicker"></div>
+  </div>
+</div>
+<div class="month-foot" id="monthFoot" aria-hidden="true"></div>
 <input type="file" id="avatarInput" accept="image/*" hidden>
 <div class="sheet-wrap" id="confirmSheet">
   <div class="sheet">
@@ -673,16 +756,17 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   function labelText(d) {
     if (view === "home") return "Slate";
-    if (view === "month") return MONTHS[d.getMonth()] + " . " + d.getFullYear();
+    if (view === "month") return MONTHS[d.getMonth()] + " " + d.getFullYear();
     if (view === "week") {
       const s = weekStart(d), e = addDays(s, 6);
       return MONTHS[s.getMonth()].slice(0,3) + " " + String(s.getDate()).padStart(2,"0") + " — " + MONTHS[e.getMonth()].slice(0,3) + " " + String(e.getDate()).padStart(2,"0") + " . " + e.getFullYear();
     }
     return view === "b"
       ? MONTHS[d.getMonth()] + " . " + String(d.getDate()).padStart(2,"0") + " . " + d.getFullYear()
-      : MONTHS[d.getMonth()] + " . " + d.getFullYear();
+      : "";
   }
   function setLabel() {
+    $("monthFoot").textContent = MONTHS[current.getMonth()] + " " + current.getFullYear();
     const txt = labelText(current);
     if (label.textContent === txt) return;
     label.getAnimations().forEach(a => a.cancel());
@@ -946,6 +1030,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     else { dayPane.replaceChildren(buildFace(current)); listPane.replaceChildren(buildList(current)); }
     if (view === "b" || view === "week") buildRoutines();
     label.textContent = labelText(current);
+    $("monthFoot").textContent = MONTHS[current.getMonth()] + " " + current.getFullYear();
     if (animate) introAnim(1, 0);
   }
   function introAnim(dir, base) {
@@ -1022,6 +1107,144 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     hideHint();
   }
 
+  // ---------- color picker (saturation/brightness square, hue, opacity) ----------
+  function hsvToRgb(h, s, v) {
+    const f = n => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+    return [f(5), f(3), f(1)].map(x => Math.round(x * 255));
+  }
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    let h = 0;
+    if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return [(h * 60 + 360) % 360, mx ? d / mx : 0, mx];
+  }
+  function parseHex(hex) {
+    const m = String(hex).trim().replace(/^#/, "").match(/^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+    if (!m) return null;
+    let x = m[1]; if (x.length === 3) x = x.split("").map(c => c + c).join("");
+    return [parseInt(x.slice(0, 2), 16), parseInt(x.slice(2, 4), 16), parseInt(x.slice(4, 6), 16), x.length === 8 ? parseInt(x.slice(6, 8), 16) / 255 : 1];
+  }
+  const toHex = (rgb, a) => "#" + rgb.map(v => v.toString(16).padStart(2, "0")).join("") + (a < .995 ? Math.round(a * 255).toString(16).padStart(2, "0") : "");
+  function makePicker(host, initial, onChange) {
+    host.innerHTML = `<div class="cp-sv" aria-label="Saturation and brightness"><i class="cp-knob"></i></div>
+      <div class="cp-bar cp-hue" aria-label="Hue"><i class="cp-knob"></i></div>
+      <div class="cp-bar cp-alpha" aria-label="Opacity"><div class="fill"></div><i class="cp-knob"></i></div>
+      <div class="cp-row"><span class="cp-sw"></span><input class="cp-hex" type="text" maxlength="9" spellcheck="false" aria-label="Hex color"></div>`;
+    const sv = host.querySelector(".cp-sv"), hue = host.querySelector(".cp-hue"), alpha = host.querySelector(".cp-alpha");
+    const hexIn = host.querySelector(".cp-hex"), sw = host.querySelector(".cp-sw");
+    let h = 0, sa = 1, va = 1, a = 1;
+    const hex = () => toHex(hsvToRgb(h, sa, va), a);
+    function paint(skipInput) {
+      const pure = `rgb(${hsvToRgb(h, 1, 1).join(",")})`, col = hsvToRgb(h, sa, va);
+      sv.style.background = pure;
+      const k1 = sv.querySelector(".cp-knob"); k1.style.left = sa * 100 + "%"; k1.style.top = (1 - va) * 100 + "%"; k1.style.background = `rgb(${col.join(",")})`;
+      const k2 = hue.querySelector(".cp-knob"); k2.style.left = h / 360 * 100 + "%"; k2.style.background = pure;
+      alpha.querySelector(".fill").style.background = `linear-gradient(to right, rgba(${col.join(",")},0), rgb(${col.join(",")}))`;
+      const k3 = alpha.querySelector(".cp-knob"); k3.style.left = a * 100 + "%"; k3.style.background = `rgba(${col.join(",")},${a})`;
+      sw.style.background = `rgba(${col.join(",")},${a})`;
+      if (!skipInput) hexIn.value = hex().toUpperCase();
+    }
+    function set(hx) { const p = parseHex(hx); if (!p) return; [h, sa, va] = rgbToHsv(p[0], p[1], p[2]); a = p[3]; paint(); }
+    const emit = () => onChange && onChange(hex());
+    function drag(el, fn) {
+      el.addEventListener("pointerdown", e => {
+        e.preventDefault(); el.setPointerCapture(e.pointerId);
+        const move = ev => { const r = el.getBoundingClientRect(); fn(Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (ev.clientY - r.top) / r.height))); paint(); emit(); };
+        move(e);
+        const up = () => { el.removeEventListener("pointermove", move); el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", up); };
+        el.addEventListener("pointermove", move); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+      });
+    }
+    drag(sv, (x, y) => { sa = x; va = 1 - y; });
+    drag(hue, x => { h = Math.min(359.9, x * 360); });
+    drag(alpha, x => { a = Math.round(x * 100) / 100; });
+    hexIn.addEventListener("input", () => { const p = parseHex(hexIn.value); if (!p) return; [h, sa, va] = rgbToHsv(p[0], p[1], p[2]); a = p[3]; paint(true); emit(); });
+    hexIn.addEventListener("blur", () => paint());
+    set(initial);
+    return { set, get: hex };
+  }
+
+  // ---------- accents ----------
+  const ACCENTS = [
+    { id: "label", name: "Date at the top", sel: ".label" },
+    { id: "monthfoot", name: "Month at the bottom", sel: ".month-foot" },
+    { id: "weekday", name: "Day name", sel: ".weekday" },
+    { id: "numeral", name: "Big date number", sel: ".numeral" },
+    { id: "time", name: "Task times", sel: ".row .time" },
+    { id: "mnum", name: "Month calendar dates", sel: ".m-num" },
+    { id: "mtoday", name: "Today on the month calendar", sel: ".m-cell.today .m-num span", bg: true },
+    { id: "mhead", name: "Month calendar weekdays", sel: ".m-head span" },
+    { id: "wk", name: "Week planner days", sel: ".wk-day, .wk-num" },
+    { id: "routines", name: "Routines title", sel: ".r-head h2" },
+    { id: "greet", name: "Home greeting", sel: ".greet" },
+    { id: "clock", name: "Home clock", sel: ".clock .t" },
+    { id: "hlabel", name: "Home section titles", sel: ".h-label" },
+    { id: "ring", name: "Progress ring", sel: ".ring .arc", stroke: true }
+  ];
+  let accents = {};
+  try { accents = JSON.parse(localStorage.getItem("slate.accents") || "{}") || {}; } catch (e) { accents = {}; }
+  const accStyle = document.createElement("style"); accStyle.id = "accentCss"; document.head ? document.head.appendChild(accStyle) : document.body.appendChild(accStyle);
+  function readableOn(hx) { const p = parseHex(hx) || [0, 0, 0, 1]; const L = (.299 * p[0] + .587 * p[1] + .114 * p[2]) / 255; return L > .6 ? "#111" : "#fff"; }
+  function applyAccents() {
+    accStyle.textContent = ACCENTS.filter(a => accents[a.id] && accents[a.id].on).map(a => {
+      const c = accents[a.id].color;
+      const sel = a.sel.split(",").map(x => x.trim());
+      if (a.bg) return `${sel.join(", ")} { background: ${c} !important; color: ${readableOn(c)} !important; }`;
+      if (a.stroke) return `${sel.join(", ")} { stroke: ${c} !important; }`;
+      return `${sel.join(", ")} { color: ${c} !important; }`;
+    }).join("\n");
+  }
+  const saveAccents = () => { try { localStorage.setItem("slate.accents", JSON.stringify(accents)); } catch (e) {} applyAccents(); };
+  applyAccents();
+  let accSel = null;
+  const accPicker = makePicker($("accPicker"), "#ff5a36", c => {
+    if (!accSel) return;
+    accents[accSel] = { on: true, color: c }; saveAccents(); renderAccList(true);
+  });
+  function renderAccList(light) {
+    const list = $("accList");
+    if (!light) list.replaceChildren();
+    ACCENTS.forEach(a => {
+      const st = accents[a.id], on = !!(st && st.on);
+      let it = list.querySelector(`[data-acc="${a.id}"]`);
+      if (!it) {
+        it = document.createElement("div"); it.className = "acc-item"; it.dataset.acc = a.id;
+        it.innerHTML = `<span class="sw"></span><button type="button" class="nm"></button><button type="button" class="tgl" role="switch"></button>`;
+        it.querySelector(".nm").textContent = a.name;
+        it.querySelector(".nm").addEventListener("click", () => selectAcc(a.id));
+        it.querySelector(".sw").addEventListener("click", () => selectAcc(a.id));
+        it.querySelector(".tgl").addEventListener("click", () => {
+          const cur = accents[a.id];
+          if (cur && cur.on) { cur.on = false; if (accSel === a.id) { accSel = null; $("accEdit").hidden = true; } }
+          else { accents[a.id] = { on: true, color: (cur && cur.color) || "#ff5a36" }; selectAcc(a.id); }
+          saveAccents(); renderAccList(true);
+        });
+        list.appendChild(it);
+      }
+      it.classList.toggle("sel", accSel === a.id);
+      const sw = it.querySelector(".sw"); sw.classList.toggle("off", !on); sw.style.background = on ? st.color : "";
+      const t = it.querySelector(".tgl"); t.classList.toggle("on", on); t.setAttribute("aria-checked", String(on)); t.setAttribute("aria-label", a.name + " accent");
+    });
+  }
+  function selectAcc(id) {
+    accSel = id;
+    const a = ACCENTS.find(x => x.id === id), st = accents[id];
+    if (!st || !st.on) { accents[id] = { on: true, color: (st && st.color) || "#ff5a36" }; saveAccents(); }
+    $("accEditName").textContent = a.name;
+    accPicker.set(accents[id].color);
+    $("accEdit").hidden = false;
+    renderAccList(true);
+    $("accEdit").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  $("accReset").addEventListener("click", () => { if (accSel && accents[accSel]) { accents[accSel].on = false; saveAccents(); } accSel = null; $("accEdit").hidden = true; renderAccList(true); });
+  $("accentsOpt").addEventListener("click", () => {
+    $("settingsSheet").classList.remove("open");
+    renderAccList(); accSel = null; $("accEdit").hidden = true;
+    $("accPage").classList.add("open"); $("accPage").setAttribute("aria-hidden", "false");
+  });
+  $("accDone").addEventListener("click", () => { $("accPage").classList.remove("open"); $("accPage").setAttribute("aria-hidden", "true"); });
+
   // ---------- month ----------
   function buildMonth(d) {
     const v = document.createElement("div"); v.className = "m-view";
@@ -1042,9 +1265,15 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       cell.dataset.key = key;
       cell.setAttribute("aria-label", `${DAYS[day.getDay()]} ${MONTHS[day.getMonth()]} ${day.getDate()}, ${tasks.length} task${tasks.length === 1 ? "" : "s"}`);
       cell.innerHTML = `<div class="m-num"><span>${day.getDate()}</span></div>`;
-      const max = weeks > 5 ? 2 : 3;
-      tasks.slice(0, max).forEach(t => { const c = document.createElement("div"); c.className = "m-chip" + (t.done ? " done" : ""); c.textContent = t.text; cell.appendChild(c); });
-      if (tasks.length > max) { const m = document.createElement("div"); m.className = "m-more"; m.textContent = "+" + (tasks.length - max) + " more"; cell.appendChild(m); }
+      const max = 2;
+      tasks.slice(0, max).forEach(t => {
+        const c = document.createElement("div"); c.className = "m-chip" + (t.done ? " done" : "");
+        const cat = catOf(t);
+        c.innerHTML = (cat ? `<span class="cd" style="background:${cat.color}"></span>` : "") + `<span class="tx"></span>`;
+        c.querySelector(".tx").textContent = t.text;
+        cell.appendChild(c);
+      });
+      if (tasks.length > max) { const m = document.createElement("div"); m.className = "m-more"; m.textContent = "View more"; cell.appendChild(m); }
       if (tasks.length) { const dots = document.createElement("div"); dots.className = "m-dots"; dots.innerHTML = tasks.slice(0, 6).map(t => `<i${t.done ? ' class="done"' : ""}></i>`).join(""); cell.appendChild(dots); }
       grid.appendChild(cell);
     }
@@ -1067,7 +1296,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   function refreshMonth() { if (view === "month") monthPane.replaceChildren(buildMonth(current)); }
 
   let mdKey = null;
-  function openMonthDay(key) {
+  function openMonthDay(key, keep) {
+    if (!keep) mdCat = null;
     mdKey = key;
     const d = dateOf(key), arr = normalize(tasksAt(key)), dn = arr.filter(t => t.done).length;
     $("mdTitle").textContent = DAYS[d.getDay()] + ", " + cap(MONTHS[d.getMonth()]) + " " + d.getDate();
@@ -1076,18 +1306,73 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     arr.forEach(t => {
       const it = document.createElement("div");
       it.className = "dd-item" + (t.done ? " done" : "");
-      it.innerHTML = `<span class="c">${t.done ? CHECK : ""}</span><span class="t"></span>${t.t ? `<span class="tm">${fmtTime(t.t)}</span>` : ""}`;
+      const cat = catOf(t);
+      it.innerHTML = `<span class="c">${t.done ? CHECK : ""}</span><span class="t"></span>${t.t ? `<span class="tm">${fmtTime(t.t)}</span>` : ""}<button type="button" class="catp" aria-label="Change category"></button>`;
       it.querySelector(".t").textContent = t.text;
+      const cp = it.querySelector(".catp");
+      cp.innerHTML = cat ? `<span class="cd" style="background:${cat.color}"></span>` : "";
+      cp.append(cat ? cat.name : "No category");
+      cp.addEventListener("click", () => {
+        const ids = [null, ...store.__categories.map(c => c.id)];
+        t.cat = ids[(ids.indexOf(t.cat || null) + 1) % ids.length] || undefined;
+        if (!t.cat) delete t.cat;
+        save(); openMonthDay(mdKey, true); refreshMonth();
+      });
       list.appendChild(it);
     });
-    $("mdInput").value = "";
+    if (!keep) { $("mdInput").value = ""; $("catNew").hidden = true; }
+    renderCats();
     $("mdSheet").classList.add("open");
   }
+
+  // ---------- categories ----------
+  if (!Array.isArray(store.__categories)) { store.__categories = [{ id: "holiday", name: "Holiday", color: "#f0544f" }]; save(); }
+  let mdCat = null;
+  function catOf(t) { return t && t.cat ? store.__categories.find(c => c.id === t.cat) || null : null; }
+  function renderCats() {
+    const row = $("mdCats"); row.replaceChildren();
+    const chip = (id, name, color) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "cat-chip";
+      b.setAttribute("role", "radio"); b.setAttribute("aria-checked", String((mdCat || null) === id));
+      b.innerHTML = (color ? `<span class="cd" style="background:${color}"></span>` : "");
+      b.append(name);
+      if (id && id !== "holiday") {
+        const x = document.createElement("span"); x.className = "rmc"; x.setAttribute("role", "button"); x.setAttribute("aria-label", "Delete " + name); x.innerHTML = X_ICON;
+        x.addEventListener("click", ev => {
+          ev.stopPropagation();
+          store.__categories = store.__categories.filter(c => c.id !== id);
+          Object.keys(store).forEach(k => { if (/^\d{4}-/.test(k)) store[k].forEach(t => { if (t.cat === id) delete t.cat; }); });
+          if (mdCat === id) mdCat = null;
+          save(); openMonthDay(mdKey, true); refreshMonth();
+        });
+        b.appendChild(x);
+      }
+      b.addEventListener("click", () => { mdCat = id; renderCats(); });
+      row.appendChild(b);
+    };
+    chip(null, "No category");
+    store.__categories.forEach(c => chip(c.id, c.name, c.color));
+    const add = document.createElement("button"); add.type = "button"; add.className = "cat-chip add"; add.textContent = "+ New category";
+    add.addEventListener("click", () => { $("catNew").hidden = false; $("catName").value = ""; catPicker.set("#4f7cff"); setTimeout(() => $("catName").focus(), 50); });
+    row.appendChild(add);
+  }
+  let catColor = "#4f7cff";
+  const catPicker = makePicker($("catPicker"), catColor, c => catColor = c);
+  $("catCancel").addEventListener("click", () => $("catNew").hidden = true);
+  const saveCat = () => {
+    const name = $("catName").value.trim(); if (!name) { $("catName").focus(); return; }
+    const id = "c" + Date.now().toString(36);
+    store.__categories.push({ id, name, color: catColor }); save();
+    mdCat = id; $("catNew").hidden = true; renderCats();
+  };
+  $("catSave").addEventListener("click", saveCat);
+  $("catName").addEventListener("keydown", e => { if (e.key === "Enter") saveCat(); });
   monthPane.addEventListener("click", e => { const c = e.target.closest(".m-cell"); if (c && !busy) openMonthDay(c.dataset.key); });
   const mdAdd = () => {
     const v = $("mdInput").value.trim(); if (!v || !mdKey) return;
-    const arr = tasksAt(mdKey); arr.splice(undoneCount(arr), 0, { t: "", text: v, done: false }); save();
-    openMonthDay(mdKey); refreshMonth(); $("mdInput").focus();
+    const task = { t: "", text: v, done: false }; if (mdCat) task.cat = mdCat;
+    const arr = tasksAt(mdKey); arr.splice(undoneCount(arr), 0, task); save();
+    openMonthDay(mdKey, true); $("mdInput").value = ""; refreshMonth(); $("mdInput").focus();
   };
   $("mdAdd").addEventListener("click", mdAdd);
   $("mdInput").addEventListener("keydown", e => { if (e.key === "Enter") mdAdd(); });
@@ -1318,7 +1603,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       startY = null;
       return;
     }
-    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .wk-add, .home-pane, .ideas-page")) { startY = null; return; }
+    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .wk-add, .home-pane, .ideas-page, .side-panel")) { startY = null; return; }
     fromInput = !!e.target.closest("input");
     startY = e.clientY; startX = e.clientX; startT = performance.now();
   });
@@ -1380,13 +1665,13 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   let wheelAcc = 0, wheelTimer;
   document.addEventListener("wheel", e => {
-    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .home-pane, .ideas-page")) return;
+    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .home-pane, .ideas-page, .side-panel")) return;
     wheelAcc += e.deltaY; clearTimeout(wheelTimer);
     wheelTimer = setTimeout(() => wheelAcc = 0, 180);
     if (Math.abs(wheelAcc) > 80) { go(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; }
   }, { passive: true });
   document.addEventListener("keydown", e => {
-    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || document.querySelector(".sheet-wrap.open, .ideas-page.open")) return;
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || document.querySelector(".sheet-wrap.open, .ideas-page.open, .side-panel.open")) return;
     if (e.key === "ArrowDown" || e.key === "ArrowRight") go(1);
     if (e.key === "ArrowUp" || e.key === "ArrowLeft") go(-1);
   });
@@ -1766,7 +2051,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   }
 
   // ---------- back up / restore ----------
-  const LS_KEYS = ["slate.avatar", "slate.theme", "slate.style", "slate.cal", "slate.view"];
+  const LS_KEYS = ["slate.avatar", "slate.theme", "slate.style", "slate.accents", "slate.cal", "slate.view"];
   function backupText() {
     const extra = {};
     LS_KEYS.forEach(k => { try { const v = localStorage.getItem(k); if (v != null) extra[k] = v; } catch (e) {} });
