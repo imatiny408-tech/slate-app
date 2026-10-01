@@ -828,8 +828,26 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     f.innerHTML = `<div class="weekday">${DAYS[d.getDay()]}</div>
       <div class="numeral">${d.getDate()}</div>
       <div class="today-tag">${isToday ? (view === "b" ? "" : "Today") : `<button type="button" data-today>Back to today</button>`}</div>`;
+    requestAnimationFrame(() => alignToday(f));
     return f;
   }
+  // Digits like "1" sit off-center in their box, so center the tag under the number's actual ink
+  const measureCtx = document.createElement("canvas").getContext("2d");
+  function alignToday(face) {
+    const num = face && face.querySelector(".numeral"), tag = face && face.querySelector(".today-tag");
+    if (!num || !tag || !num.offsetWidth) { if (tag) tag.style.transform = ""; return; }
+    const cs = getComputedStyle(num), txt = num.textContent;
+    measureCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const m = measureCtx.measureText(txt);
+    const ls = parseFloat(cs.letterSpacing) || 0;
+    const inkLeft = -m.actualBoundingBoxLeft, inkRight = m.actualBoundingBoxRight + ls * (txt.length - 1);
+    const boxWidth = m.width + ls * txt.length;
+    const shift = (inkLeft + inkRight) / 2 - boxWidth / 2;
+    tag.style.transform = Math.abs(shift) > .5 ? `translateX(${shift.toFixed(1)}px)` : "";
+  }
+  const realignToday = () => dayPane.querySelectorAll(".day-face").forEach(alignToday);
+  window.addEventListener("resize", realignToday);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(realignToday);
 
   // ---------- task list (day views) ----------
   const rowTask = new WeakMap();
