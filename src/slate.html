@@ -342,6 +342,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .acc-head { display: flex; align-items: center; justify-content: space-between; }
 .acc-head h2 { font-weight: 400; font-size: 34px; margin: 0; }
 .acc-done { padding: 10px 18px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 15px; }
+.acc-for { margin: 6px 0 0; font-size: 15px; font-weight: 600; }
 .acc-hint { color: var(--muted); font-size: 15px; line-height: 1.4; margin: 10px 0 14px; }
 .acc-list { display: flex; flex-direction: column; }
 .acc-item { display: flex; align-items: center; gap: 12px; padding-block: 11px; border-top: 1.5px solid var(--line); font-size: 16px; text-align: left; width: 100%; }
@@ -640,7 +641,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <h2>Accents</h2>
     <button type="button" class="acc-done" id="accDone">Done</button>
   </div>
-  <p class="acc-hint">Turn on an accent for any area, then pick its color. Changes show on the screen right away.</p>
+  <p class="acc-for" id="accFor"></p>
+  <p class="acc-hint">These are the areas on the screen you're on. Turn one on, then pick its color. Switch screens to set accents there.</p>
   <div class="acc-list" id="accList"></div>
   <div class="acc-edit" id="accEdit" hidden>
     <div class="acc-edit-head"><span id="accEditName"></span><button type="button" class="link" id="accReset">Turn off</button></div>
@@ -1167,20 +1169,20 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   // ---------- accents ----------
   const ACCENTS = [
-    { id: "label", name: "Date at the top", sel: ".label" },
-    { id: "monthfoot", name: "Month at the bottom", sel: ".month-foot" },
-    { id: "weekday", name: "Day name", sel: ".weekday" },
-    { id: "numeral", name: "Big date number", sel: ".numeral" },
-    { id: "time", name: "Task times", sel: ".row .time" },
-    { id: "mnum", name: "Month calendar dates", sel: ".m-num" },
-    { id: "mtoday", name: "Today on the month calendar", sel: ".m-cell.today .m-num span", bg: true },
-    { id: "mhead", name: "Month calendar weekdays", sel: ".m-head span" },
-    { id: "wk", name: "Week planner days", sel: ".wk-day, .wk-num" },
-    { id: "routines", name: "Routines title", sel: ".r-head h2" },
-    { id: "greet", name: "Home greeting", sel: ".greet" },
-    { id: "clock", name: "Home clock", sel: ".clock .t" },
-    { id: "hlabel", name: "Home section titles", sel: ".h-label" },
-    { id: "ring", name: "Progress ring", sel: ".ring .arc", stroke: true }
+    { id: "label", name: "Date at the top", sel: ".label", views: ["b", "week", "month", "home"] },
+    { id: "monthfoot", name: "Month at the bottom", sel: ".month-foot", views: ["a"] },
+    { id: "weekday", name: "Day name", sel: ".weekday", views: ["a", "b"] },
+    { id: "numeral", name: "Big date number", sel: ".numeral", views: ["a"] },
+    { id: "time", name: "Task times", sel: ".row .time", views: ["a", "b"] },
+    { id: "mnum", name: "Dates", sel: ".m-num", views: ["month"] },
+    { id: "mtoday", name: "Today's circle", sel: ".m-cell.today .m-num span", bg: true, views: ["month"] },
+    { id: "mhead", name: "Weekday names", sel: ".m-head span", views: ["month"] },
+    { id: "wk", name: "Day names and dates", sel: ".wk-day, .wk-num", views: ["week"] },
+    { id: "routines", name: "Routines title", sel: ".r-head h2", views: ["b", "week"] },
+    { id: "greet", name: "Greeting", sel: ".greet", views: ["home"] },
+    { id: "clock", name: "Clock", sel: ".clock .t", views: ["home"] },
+    { id: "hlabel", name: "Section titles", sel: ".h-label", views: ["home"] },
+    { id: "ring", name: "Progress ring", sel: ".ring .arc", stroke: true, views: ["home"] }
   ];
   let accents = {};
   try { accents = JSON.parse(localStorage.getItem("slate.accents") || "{}") || {}; } catch (e) { accents = {}; }
@@ -1202,10 +1204,12 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (!accSel) return;
     accents[accSel] = { on: true, color: c }; saveAccents(); renderAccList(true);
   });
+  const VIEW_NAMES = { a: "this calendar", b: "this calendar", week: "the week planner", month: "the month calendar", home: "Home" };
   function renderAccList(light) {
     const list = $("accList");
     if (!light) list.replaceChildren();
-    ACCENTS.forEach(a => {
+    $("accFor").textContent = "Accents for " + VIEW_NAMES[view];
+    ACCENTS.filter(a => a.views.includes(view)).forEach(a => {
       const st = accents[a.id], on = !!(st && st.on);
       let it = list.querySelector(`[data-acc="${a.id}"]`);
       if (!it) {
@@ -1395,6 +1399,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         if (next === "a" || next === "b") lastDayLayout = next;
         try { localStorage.setItem("slate.cal", calView); localStorage.setItem("slate.view", view); } catch (e) {}
         applyViewClasses();
+        if ($("accPage").classList.contains("open")) { accSel = null; $("accEdit").hidden = true; renderAccList(); }
         main.getAnimations().forEach(a => a.cancel());
         setLabel();
         render(false);
