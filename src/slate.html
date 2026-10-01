@@ -387,6 +387,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .acct-forgot { display: block; margin: 14px auto 0; }
 .acct-email { font-size: 20px; margin: -6px 0 6px; overflow-wrap: anywhere; }
 .acct-note { margin: 12px 0 0; font-size: 13px; }
+.acct-phone-row { margin: 4px 0 14px; border-bottom: 1.5px solid var(--line); }
+.ph-code { letter-spacing: .3em; font-variant-numeric: tabular-nums; text-align: center; font-size: 22px; }
 
 /* ---------- Kids Center ---------- */
 .icon-btn .bg { fill: var(--card); transition: fill .35s ease; }
@@ -777,6 +779,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         <div class="seg seg-wide acct-seg" id="acctSeg"><button type="button" data-m="in">Sign in</button><button type="button" data-m="up">Create account</button></div>
         <input class="acct-in" id="acctEmail2" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40">
         <input class="acct-in" id="acctPass" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" enterkeyhint="go">
+        <input class="acct-in" id="acctPhone" type="tel" placeholder="Phone number (optional, for password help)" aria-label="Phone number for password help" autocomplete="tel" hidden>
         <button type="button" class="acct-go" id="acctGo">Sign in</button>
         <button type="button" class="link acct-forgot" id="acctForgot" hidden>Forgot password?</button>
         <p class="feel-hint bk-status" id="acctStatus" aria-live="polite"></p>
@@ -785,10 +788,32 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <div id="acctIn" hidden>
       <p class="acct-email" id="acctEmail"></p>
       <p class="feel-hint" id="acctSync" aria-live="polite"></p>
+      <button type="button" class="opt acct-phone-row" id="acctPhoneRow"><span>Phone for password help</span><span id="acctPhoneVal" style="color:var(--muted)">Add</span></button>
       <div class="confirm-btns"><button type="button" id="acctSyncNow">Sync now</button><button type="button" id="acctOutBtn">Sign out</button></div>
       <p class="feel-hint acct-note">Signing out keeps everything on this iPad.</p>
     </div>
     <button class="close" data-close>Done</button>
+  </div>
+</div>
+<div class="sheet-wrap" id="phoneSheet">
+  <div class="sheet">
+    <h2 id="phTitle">Reset your password</h2>
+    <p class="feel-hint" id="phHint"></p>
+    <div id="phStepPhone">
+      <input class="acct-in" id="phPhone" type="tel" placeholder="Phone number" aria-label="Phone number" autocomplete="tel" enterkeyhint="send">
+      <button type="button" class="acct-go" id="phSend">Text me a code</button>
+    </div>
+    <div id="phStepCode" hidden>
+      <input class="acct-in ph-code" id="phCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" aria-label="Code from the text message" enterkeyhint="done">
+      <button type="button" class="acct-go" id="phVerify">Continue</button>
+      <button type="button" class="link acct-forgot" id="phResend">Send a new code</button>
+    </div>
+    <div id="phStepPw" hidden>
+      <input class="acct-in" id="phPw" type="password" placeholder="New password" aria-label="New password" autocomplete="new-password" enterkeyhint="done">
+      <button type="button" class="acct-go" id="phSavePw">Save new password</button>
+    </div>
+    <p class="feel-hint bk-status" id="phStatus" aria-live="polite"></p>
+    <button class="close" data-close>Cancel</button>
   </div>
 </div>
 <div class="sheet-wrap" id="choiceSheet">
@@ -1976,7 +2001,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
 
   function openSheet(el) { el.classList.add("open"); }
-  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet").forEach(w => w.addEventListener("click", e => {
+  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet, #phoneSheet").forEach(w => w.addEventListener("click", e => {
     if (e.target === w || e.target.closest("[data-close]")) w.classList.remove("open");
   }));
 
@@ -2862,6 +2887,10 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (/not confirmed/i.test(m)) return "This account isn't ready yet. Try again in a moment.";
     if (/already registered|already exists/i.test(m)) return "That username is taken. Try another one.";
     if (/provider is not enabled|unsupported provider/i.test(m)) return "Sign in with Apple isn't set up yet.";
+    if (/sms|phone provider|twilio|messagebird|vonage|textlocal|phone.*(disabled|not enabled)/i.test(m)) return "Text messages aren't set up for Slate yet, so codes can't be sent.";
+    if (/signups not allowed for otp|user not found/i.test(m)) return "No account has that phone number. Check it, or sign in with your username.";
+    if (/token has expired|invalid.*(otp|token)|otp.*(expired|invalid)/i.test(m)) return "That code didn't work. Check it, or send a new one.";
+    if (/phone.*(invalid|format)|invalid phone/i.test(m)) return "That phone number doesn't look right. Include the area code.";
     if (/password.*(6|characters|short)/i.test(m)) return "Use a password with at least 6 characters.";
     if (/valid email|invalid.*email/i.test(m)) return "That email address doesn't look right.";
     if (/rate limit|too many/i.test(m)) return "Too many tries for now. Wait a few minutes and try again.";
@@ -2879,7 +2908,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     return j;
   }
   function setSession(j) {
-    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id };
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id, phone: (j.user && j.user.phone) || (session && session.phone) || "" };
     writeJSON("slate.session", session);
     updateAcctUI();
   }
@@ -2976,6 +3005,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   function updateAcctUI() {
     $("acctVal").textContent = session ? displayName(session.email) || "Signed in" : "Sign in";
     $("acctOut").hidden = !!session; $("acctIn").hidden = !session;
+    if (session) { $("acctPhoneVal").textContent = session.phone ? prettyPhone(session.phone) : "Add"; }
     if (session) { $("acctEmail").textContent = displayName(session.email) || "Signed in with Apple"; setSyncMsg(lastSyncMsg || (syncMeta.syncedAt ? "Saved to your account" : "Not synced yet")); }
   }
   function setAcctMode(m) {
@@ -2983,7 +3013,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     $("acctSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.m === m)));
     $("acctGo").textContent = m === "in" ? "Sign in" : "Create account";
     $("acctPass").setAttribute("autocomplete", m === "in" ? "current-password" : "new-password");
-    $("acctForgot").hidden = true;
+    $("acctForgot").hidden = m !== "in";
+    $("acctPhone").hidden = m !== "up";
     acctStatus("");
   }
   const acctStatus = (m, ok) => { const s = $("acctStatus"); s.textContent = m; s.classList.toggle("ok", !!ok); };
@@ -3029,14 +3060,85 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     } catch (e) { acctStatus(friendly(e)); }
     btn.disabled = false;
   };
-  $("acctGo").addEventListener("click", acctSubmit);
-  $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
-  $("acctForgot").addEventListener("click", async () => {
-    const email = $("acctEmail2").value.trim();
-    if (!email) { acctStatus("Type your email above first."); $("acctEmail2").focus(); return; }
-    try { await sbAuth("recover?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email }); acctStatus("Check your email for a link to set a new password.", true); }
-    catch (e) { acctStatus(friendly(e)); }
+  $("acctGo").addEventListener("click", async () => {
+    const phone = acctMode === "up" ? $("acctPhone").value.trim() : "";
+    await acctSubmit();
+    if (session && phone) openPhone("add", phone, true);
   });
+  $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
+  $("acctForgot").addEventListener("click", () => openPhone("reset"));
+  $("acctPhoneRow").addEventListener("click", () => openPhone("add", session && session.phone ? "+" + session.phone : ""));
+
+  // ---- phone: add a number to an account, or reset a password by text ----
+  let phMode = "reset", phNumber = "";
+  function e164(raw) {
+    const t = raw.trim(), d = t.replace(/\D/g, "");
+    if (t.startsWith("+")) return d.length >= 8 ? "+" + d : null;
+    if (d.length === 10) return "+1" + d;
+    if (d.length === 11 && d[0] === "1") return "+" + d;
+    return null;
+  }
+  const prettyPhone = p => { const d = String(p || "").replace(/\D/g, ""); return d.length === 11 && d[0] === "1" ? `(${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7)}` : (d ? "+" + d : ""); };
+  const phStatus = (m, ok) => { $("phStatus").textContent = m; $("phStatus").classList.toggle("ok", !!ok); };
+  function phStep(step) {
+    $("phStepPhone").hidden = step !== "phone"; $("phStepCode").hidden = step !== "code"; $("phStepPw").hidden = step !== "pw";
+    const f = { phone: "phPhone", code: "phCode", pw: "phPw" }[step];
+    setTimeout(() => $(f).focus(), 250);
+  }
+  function openPhone(mode, prefill, autoSend) {
+    if (!CAN_SYNC) return;
+    phMode = mode;
+    $("phTitle").textContent = mode === "reset" ? "Reset your password" : "Phone for password help";
+    $("phHint").textContent = mode === "reset"
+      ? "Enter the phone number on your account. We'll text you a code so you can choose a new password."
+      : "If you ever forget your password, Slate can text a code to this number.";
+    $("phPhone").value = prefill || ""; $("phCode").value = ""; $("phPw").value = ""; phStatus("");
+    $("acctSheet").classList.remove("open");
+    $("phoneSheet").classList.add("open");
+    phStep("phone");
+    if (autoSend && prefill) sendCode();
+  }
+  async function sendCode() {
+    const p = e164($("phPhone").value);
+    if (!p) { phStatus("Enter the full phone number, with area code."); $("phPhone").focus(); return; }
+    phNumber = p; phStatus("Sending…");
+    try {
+      if (phMode === "reset") await sbAuth("otp", { phone: p, create_user: false });
+      else await sbAuth("user", { phone: p }, await getToken(), "PUT");
+      phStatus("We texted a code to " + prettyPhone(p) + ".", true); phStep("code");
+    } catch (e) { phStatus(friendly(e)); }
+  }
+  $("phSend").addEventListener("click", sendCode);
+  $("phPhone").addEventListener("keydown", e => { if (e.key === "Enter") sendCode(); });
+  $("phResend").addEventListener("click", () => { phStep("phone"); sendCode(); });
+  async function verifyCode() {
+    const token = $("phCode").value.replace(/\D/g, "");
+    if (token.length < 6) { phStatus("Enter the 6-digit code from the text."); return; }
+    phStatus("Checking…");
+    try {
+      const j = await sbAuth("verify", { type: phMode === "reset" ? "sms" : "phone_change", phone: phNumber, token }, phMode === "add" ? await getToken() : null);
+      if (phMode === "reset") { if (j.access_token) setSession(j); phStatus(""); phStep("pw"); }
+      else {
+        if (j.access_token) setSession(j); else if (session) { session.phone = phNumber.replace("+", ""); writeJSON("slate.session", session); }
+        $("phoneSheet").classList.remove("open"); updateAcctUI(); showToast({ text: "Phone number saved for password help." });
+      }
+    } catch (e) { phStatus(friendly(e)); }
+  }
+  $("phVerify").addEventListener("click", verifyCode);
+  $("phCode").addEventListener("keydown", e => { if (e.key === "Enter") verifyCode(); });
+  $("phCode").addEventListener("input", () => { if ($("phCode").value.replace(/\D/g, "").length === 6) verifyCode(); });
+  async function saveNewPw() {
+    const p = $("phPw").value;
+    if (p.length < 6) { phStatus("Use at least 6 characters."); return; }
+    try {
+      await sbAuth("user", { password: p }, await getToken(), "PUT");
+      $("phoneSheet").classList.remove("open");
+      showToast({ text: "Your new password is saved, and you're signed in." });
+      updateAcctUI(); syncNow(true);
+    } catch (e) { phStatus(friendly(e)); }
+  }
+  $("phSavePw").addEventListener("click", saveNewPw);
+  $("phPw").addEventListener("keydown", e => { if (e.key === "Enter") saveNewPw(); });
   $("acctSyncNow").addEventListener("click", () => syncNow());
   $("acctOutBtn").addEventListener("click", async () => {
     const b = $("acctOutBtn");
