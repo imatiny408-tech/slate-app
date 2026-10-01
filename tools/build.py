@@ -23,8 +23,17 @@ head = f"""<!doctype html>
 <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" id="touchIcon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon-light.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="favicon-dark.png" media="(prefers-color-scheme: dark)">
+<script>
+  // Home-screen icon: black tile in light mode, white tile in dark mode. iPadOS saves whichever is set when Slate is added.
+  (function () {{
+    var mq = window.matchMedia && matchMedia("(prefers-color-scheme: dark)");
+    function pick() {{ var l = document.getElementById("touchIcon"); if (l) l.href = mq && mq.matches ? "apple-touch-icon-dark.png" : "apple-touch-icon.png"; }}
+    pick(); if (mq && mq.addEventListener) mq.addEventListener("change", pick);
+  }})();
+</script>
 <style>:root{{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}body{{margin:0}}[hidden]{{display:none!important}}img{{max-width:100%}}</style>
 {style}
 </head>
