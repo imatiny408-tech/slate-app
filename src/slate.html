@@ -370,7 +370,109 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
 /* Month and year at the bottom of the big-date calendar */
 .month-foot { display: none; position: fixed; left: clamp(16px, 3vw, 40px); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); pointer-events: none; transition: opacity .4s ease; }
-#app:not(.b):not(.week):not(.month):not(.home) ~ .month-foot { display: block; }
+#app:not(.b):not(.week):not(.month):not(.home):not(.kids) ~ .month-foot { display: block; }
+
+/* ---------- Kids Center ---------- */
+.icon-btn .bg { fill: var(--card); transition: fill .35s ease; }
+.icon-btn.on .bg { fill: var(--ink); }
+.kids-pane { display: none; }
+#app.kids main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "kids"; }
+#app.kids .day-pane, #app.kids .list-pane, #app.kids .week-pane, #app.kids .routines, #app.kids .home-pane, #app.kids .month-pane { display: none; }
+#app.kids .kids-pane { grid-area: kids; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.kc-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.kc-title { font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -.01em; }
+.kc-sub { color: var(--muted); font-size: 16px; margin-top: 8px; }
+.seg { display: inline-flex; background: var(--card); border-radius: 999px; padding: 4px; gap: 2px; }
+.seg button { padding: 10px 20px; border-radius: 999px; font-size: 15px; color: var(--muted); transition: background .3s ease, color .3s ease; }
+.seg button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.seg-wide { background: var(--bg); display: flex; flex-wrap: wrap; }
+.seg-wide button { flex: 1; padding: 9px 12px; font-size: 14px; }
+.kc-banner { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 22px; background: var(--purple-soft); color: var(--ink); font-size: 15px; }
+.kc-bear { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: var(--card); }
+.kc-bear svg, .toast .kc-bear svg { width: 20px; height: 20px; stroke: var(--purple); fill: none; stroke-width: 1.7; }
+.kc-bear .dot { fill: var(--purple); stroke: none; }
+.kc-bear .bg { fill: var(--card); }
+.kc-body { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.kc-kids { max-width: none; }
+.kc-body:has(.kc-kids) { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+.kc-card { gap: 0; }
+.kc-list { margin-top: 12px; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; scrollbar-width: none; touch-action: none; }
+.kc-list.scrolls { touch-action: pan-y; }
+.kc-list.fade { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); }
+.kc-list::-webkit-scrollbar { display: none; }
+.kc-empty { color: var(--muted); font-size: 16px; line-height: 1.45; padding: 6px 2px; max-width: 34ch; }
+.kc-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }
+.kc-day { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0 7px; border-radius: 18px; background: var(--bg); font-size: 12px; color: var(--muted); position: relative; transition: background .25s ease, color .25s ease; }
+.kc-day b { font-weight: 400; font-size: 19px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.kc-day i { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); }
+.kc-day.today span { color: var(--ink); }
+.kc-day.sel { background: var(--ink); color: var(--bg); }
+.kc-day.sel b, .kc-day.sel span { color: var(--bg); }
+.kc-day.sel i { background: var(--bg); }
+.kc-progress { margin-top: 12px; font-size: 14px; color: var(--muted); min-height: 1.2em; }
+.kc-item { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 8px 10px 8px 10px; border-radius: 27px; background: var(--bg); text-align: left; width: 100%; box-sizing: border-box; font-size: 16px; flex: 0 0 auto; }
+.kc-check { width: 32px; height: 32px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--soft); display: grid; place-items: center; flex: 0 0 auto; background: var(--card); transition: background .3s ease, box-shadow .3s ease; }
+.kc-check svg { width: 15px; height: 15px; stroke: var(--on-green); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .35s var(--ease); }
+.kc-item.done .kc-check { background: var(--green); box-shadow: none; }
+.kc-item.done .kc-check svg { stroke-dashoffset: 0; }
+.kc-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.kc-text b { font-weight: 400; }
+.kc-text small { color: var(--muted); font-size: 13px; }
+.kc-item.done .kc-text, .kc-item.done .hw-t { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.kc-time { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; flex: 0 0 auto; padding-right: 8px; white-space: nowrap; }
+.kc-item.late .kc-time { color: var(--warn); }
+.kc-item .x { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--soft); flex: 0 0 auto; }
+.kc-item .x svg, .ed-row .x svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.hw-sub { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--purple); }
+.hw-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hw-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 12px; }
+.hw-form input { height: 44px; border: 0; border-radius: 22px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; min-width: 0; box-sizing: border-box; }
+.hw-form input::placeholder { color: var(--muted); }
+.hw-form #hwDue { color: var(--muted); }
+.hw-form button, .kc-add button { height: 44px; padding: 0 18px; border-radius: 22px; background: var(--ink); color: var(--bg); font-size: 15px; }
+.kc-add { display: flex; gap: 8px; margin-top: 12px; }
+.kc-add input { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 22px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; }
+.kc-add input::placeholder { color: var(--muted); }
+.kc-kid { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 30px; background: var(--bg); text-align: left; width: 100%; box-sizing: border-box; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .25s ease; flex: 0 0 auto; }
+.kc-kid.sel { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.kc-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--purple-soft); color: var(--purple); display: grid; place-items: center; font-size: 17px; flex: 0 0 auto; }
+.kc-pill { font-size: 12px; padding: 5px 10px; border-radius: 999px; flex: 0 0 auto; }
+.kc-pill.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.kc-notify { margin-top: 12px; align-self: flex-start; padding: 10px 16px; border-radius: 999px; background: var(--bg); font-size: 14px; }
+.ed-list { gap: 10px; }
+.ed-row { background: var(--bg); border-radius: 22px; padding: 8px 8px 10px 16px; display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; }
+.ed-top { display: flex; align-items: center; gap: 8px; }
+.ed-text { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 16px; outline: none; padding: 6px 0; }
+.ed-time { position: relative; font-size: 13px; color: var(--muted); padding: 7px 12px; border-radius: 999px; background: var(--card); white-space: nowrap; }
+.ed-time .none { color: var(--muted); }
+.ed-time input { position: absolute; inset: 0; opacity: 0; width: 100%; }
+.ed-row .x { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); flex: 0 0 auto; }
+.ed-days { display: flex; gap: 5px; flex-wrap: wrap; }
+.ed-days button { padding: 6px 0; width: 44px; border-radius: 999px; font-size: 13px; background: var(--card); color: var(--muted); transition: background .2s ease, color .2s ease; }
+.ed-days button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.ed-foot { margin-top: 14px; border-top: 1.5px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.ed-label { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.ed-send { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.kc-send { height: 46px; padding: 0 22px; border-radius: 23px; background: var(--ink); color: var(--bg); font-size: 15px; }
+.kc-send:disabled { opacity: .4; }
+.ed-status { color: var(--muted); font-size: 14px; }
+.ed-share { background: var(--bg); border-radius: 20px; padding: 14px; }
+.ed-share p { margin: 0 0 10px; font-size: 14px; color: var(--muted); line-height: 1.4; }
+.ed-share textarea { width: 100%; box-sizing: border-box; border: 0; border-radius: 14px; background: var(--card); color: var(--ink); font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 10px 12px; resize: none; outline: none; -webkit-user-select: text; user-select: text; }
+.ed-share-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.ed-share-btns button { padding: 10px 16px; border-radius: 999px; background: var(--card); font-size: 14px; }
+.toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 78px); transform: translate(-50%, -20px); z-index: 24; display: flex; align-items: center; gap: 12px; max-width: min(560px, calc(100% - 32px)); box-sizing: border-box; padding: 10px 10px 10px 12px; border-radius: 999px; background: var(--card); box-shadow: 0 14px 40px var(--shadow); font-size: 15px; opacity: 0; pointer-events: none; transition: opacity .35s ease, transform .5s var(--ease); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast .tx { flex: 1; min-width: 0; line-height: 1.3; }
+.toast .kc-bear { background: var(--purple-soft); }
+.toast .ta { padding: 9px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 14px; flex: 0 0 auto; }
+.toast .tc { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); flex: 0 0 auto; }
+.toast .tc svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+@media (max-width: 760px), (orientation: portrait) and (max-width: 900px) {
+  #app.kids .kids-pane { overflow-y: auto; touch-action: pan-y; scrollbar-width: none; }
+  .kc-body, .kc-body:has(.kc-kids) { grid-template-columns: minmax(0, 1fr); flex: 0 0 auto; }
+  .kc-card { min-height: 360px; }
+}
 
 /* ---------- Home ---------- */
 .home-pane { display: none; }
@@ -528,6 +630,9 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       <button class="icon-btn" id="addBtn" aria-label="Add a task">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
       </button>
+      <button class="icon-btn" id="kidsBtn" aria-label="Kids Center" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><circle cx="6.3" cy="6.6" r="2.6"/><circle cx="17.7" cy="6.6" r="2.6"/><circle class="bg" cx="12" cy="13" r="7.2"/><ellipse cx="12" cy="15.6" rx="3" ry="2.3"/><circle class="dot" cx="9.4" cy="11.6" r=".95"/><circle class="dot" cx="14.6" cy="11.6" r=".95"/><ellipse class="dot" cx="12" cy="14.9" rx="1.15" ry=".8"/></svg>
+      </button>
       <button class="icon-btn" id="layoutBtn" aria-label="Switch day layout">
         <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><rect class="dot" x="6.5" y="13" width="3.2" height="3.2" rx=".6"/></svg>
       </button>
@@ -543,6 +648,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <section class="week-pane" id="weekPane"></section>
     <section class="home-pane" id="homePane"></section>
     <section class="month-pane" id="monthPane"></section>
+    <section class="kids-pane" id="kidsPane"></section>
     <aside class="routines" id="routines">
       <div class="r-head">
         <h2>Routines</h2>
@@ -622,6 +728,16 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     </div>
   </div>
 </div>
+<div class="sheet-wrap" id="kidsImport">
+  <div class="sheet">
+    <h2>Get chores</h2>
+    <p class="feel-hint">Paste the chore list your grown-up sent you.</p>
+    <textarea id="kiInput" rows="3" placeholder="Paste it here…" aria-label="Chore list from your grown-up"></textarea>
+    <p class="feel-hint bk-status" id="kiStatus" aria-live="polite"></p>
+    <div class="confirm-btns"><button type="button" data-close>Cancel</button><button type="button" class="ink" id="kiGet">Get chores</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="sheet-wrap" id="feelSheet">
   <div class="sheet">
     <h2>How are you feeling today?</h2>
@@ -739,7 +855,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   // ---------- elements ----------
   const $ = id => document.getElementById(id);
-  const app = $("app"), main = $("main"), dayPane = $("dayPane"), listPane = $("listPane"), weekPane = $("weekPane"), homePane = $("homePane"), monthPane = $("monthPane"), label = $("label"), hint = $("hint");
+  const app = $("app"), main = $("main"), dayPane = $("dayPane"), listPane = $("listPane"), weekPane = $("weekPane"), homePane = $("homePane"), monthPane = $("monthPane"), kidsPane = $("kidsPane"), label = $("label"), hint = $("hint");
   const rList = $("rList"), rSearch = $("rSearch"), rSearchInput = $("rSearchInput");
 
   // Calendar button cycles a → b → week; Home is its own page
@@ -749,17 +865,20 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   try {
     const c = localStorage.getItem("slate.cal"); if (CAL_VIEWS.includes(c)) calView = c;
     if (calView === "b") lastDayLayout = "b";
-    const v = localStorage.getItem("slate.view"); view = v === "home" ? "home" : calView;
+    const v = localStorage.getItem("slate.view"); view = v === "home" || v === "kids" ? v : calView;
   } catch (e) {}
   const applyViewClasses = () => {
     app.classList.toggle("b", view === "b");
     app.classList.toggle("week", view === "week");
     app.classList.toggle("home", view === "home");
     app.classList.toggle("month", view === "month");
+    app.classList.toggle("kids", view === "kids");
+    $("kidsBtn").classList.toggle("on", view === "kids");
+    $("kidsBtn").setAttribute("aria-pressed", view === "kids");
     $("homeBtn").classList.toggle("on", view === "home");
     $("homeBtn").setAttribute("aria-pressed", view === "home");
     hint.textContent = view === "week" ? "Swipe up for next week" : view === "month" ? "Swipe up for next month" : "Swipe up for tomorrow";
-    if (view === "home") hint.style.opacity = 0; else if (!hintGone) hint.style.opacity = 1;
+    if (view === "home" || view === "kids") hint.style.opacity = 0; else if (!hintGone) hint.style.opacity = 1;
   };
   applyViewClasses();
 
@@ -768,6 +887,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   function labelText(d) {
     if (view === "home") return "Slate";
+    if (view === "kids") return "Slate";
     if (view === "month") return MONTHS[d.getMonth()] + " " + d.getFullYear();
     if (view === "week") {
       const s = weekStart(d), e = addDays(s, 6);
@@ -1053,8 +1173,9 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   // ---------- render ----------
   function render(animate) {
-    dayPane.replaceChildren(); listPane.replaceChildren(); weekPane.replaceChildren(); monthPane.replaceChildren();
+    dayPane.replaceChildren(); listPane.replaceChildren(); weekPane.replaceChildren(); monthPane.replaceChildren(); kidsPane.replaceChildren();
     if (view === "home") buildHome();
+    else if (view === "kids") buildKids();
     else if (view === "month") monthPane.appendChild(buildMonth(current));
     else if (view === "week") buildWeek();
     else { dayPane.replaceChildren(buildFace(current)); listPane.replaceChildren(buildList(current)); }
@@ -1066,6 +1187,10 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   function introAnim(dir, base) {
     if (view === "home") {
       staggerIn(homePane.querySelectorAll(".hello, .clock, .h-card"), dir, base);
+      return;
+    }
+    if (view === "kids") {
+      staggerIn(kidsPane.querySelectorAll(".kc-top, .kc-banner, .h-card"), dir, base);
       return;
     }
     if (view === "month") {
@@ -1095,7 +1220,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   ];
 
   function go(dir, target) {
-    if (busy || drag || view === "home") return;
+    if (busy || drag || view === "home" || view === "kids") return;
     if (view === "week") return goWeek(dir, target);
     if (view === "month") return goMonth(dir, target);
     busy = true;
@@ -1242,7 +1367,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   // ---------- accents ----------
   const ACCENTS = [
-    { id: "label", name: "Date at the top", sel: ".label", views: ["b", "week", "month", "home"] },
+    { id: "label", name: "Date at the top", sel: ".label", views: ["b", "week", "month", "home", "kids"] },
+    { id: "kids", name: "Kids Center title", sel: ".kc-title", views: ["kids"] },
     { id: "monthfoot", name: "Month at the bottom", sel: ".month-foot", views: ["a"] },
     { id: "weekday", name: "Day name", sel: ".weekday", views: ["a", "b"] },
     { id: "numeral", name: "Big date number", sel: ".numeral", views: ["a"] },
@@ -1277,7 +1403,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (!accSel) return;
     accents[accSel] = { on: true, color: c }; saveAccents(); renderAccList(true);
   });
-  const VIEW_NAMES = { a: "this calendar", b: "this calendar", week: "the week planner", month: "the month calendar", home: "Home" };
+  const VIEW_NAMES = { a: "this calendar", b: "this calendar", week: "the week planner", month: "the month calendar", home: "Home", kids: "the Kids Center" };
   function renderAccList(light) {
     const list = $("accList");
     if (!light) list.replaceChildren();
@@ -1468,7 +1594,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     main.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(.985)" }], { duration: 260, easing: EASE, fill: "forwards" })
       .onfinish = () => {
         view = next;
-        if (next !== "home") calView = next;
+        if (next !== "home" && next !== "kids") calView = next;
         if (next === "a" || next === "b") lastDayLayout = next;
         try { localStorage.setItem("slate.cal", calView); localStorage.setItem("slate.view", view); } catch (e) {}
         applyViewClasses();
@@ -1482,10 +1608,11 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       };
   }
   $("layoutBtn").addEventListener("click", () => {
-    if (view === "home") return switchView(calView);
+    if (view === "home" || view === "kids") return switchView(calView);
     switchView(CAL_VIEWS[(CAL_VIEWS.indexOf(view) + 1) % CAL_VIEWS.length]);
   });
   $("homeBtn").addEventListener("click", () => switchView(view === "home" ? calView : "home"));
+  $("kidsBtn").addEventListener("click", () => switchView(view === "kids" ? calView : "kids"));
 
   // ---------- routines ----------
   function buildRoutines() {
@@ -1681,7 +1808,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       startY = null;
       return;
     }
-    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .wk-add, .home-pane, .ideas-page, .side-panel")) { startY = null; return; }
+    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .wk-add, .home-pane, .ideas-page, .side-panel, .kids-pane, .toast")) { startY = null; return; }
     fromInput = !!e.target.closest("input");
     startY = e.clientY; startX = e.clientX; startT = performance.now();
   });
@@ -1743,7 +1870,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 
   let wheelAcc = 0, wheelTimer;
   document.addEventListener("wheel", e => {
-    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .home-pane, .ideas-page, .side-panel")) return;
+    if (e.target.closest(".sheet-wrap, .routines, .list.scrolls, .wk-list.scrolls, .home-pane, .ideas-page, .side-panel, .kids-pane")) return;
     wheelAcc += e.deltaY; clearTimeout(wheelTimer);
     wheelTimer = setTimeout(() => wheelAcc = 0, 180);
     if (Math.abs(wheelAcc) > 80) { go(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; }
@@ -1763,6 +1890,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   // ---------- header actions ----------
   $("addBtn").addEventListener("click", () => {
     if (view === "home") { $("ideaInput")?.focus(); return; }
+    if (view === "kids") { ($("hwText") || $("choreText") || $("kidName"))?.focus(); return; }
     if (view === "month") { openMonthDay(keyOf(current)); setTimeout(() => $("mdInput").focus(), 300); return; }
     if (view === "week") {
       const s = weekStart(current);
@@ -1780,7 +1908,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
 
   function openSheet(el) { el.classList.add("open"); }
-  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet").forEach(w => w.addEventListener("click", e => {
+  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport").forEach(w => w.addEventListener("click", e => {
     if (e.target === w || e.target.closest("[data-close]")) w.classList.remove("open");
   }));
 
@@ -2128,6 +2256,387 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     return localSummary(raw);
   }
 
+  const BEAR_ICON = '<svg viewBox="0 0 24 24"><circle cx="6.3" cy="6.6" r="2.6"/><circle cx="17.7" cy="6.6" r="2.6"/><circle class="bg" cx="12" cy="13" r="7.2"/><ellipse cx="12" cy="15.6" rx="3" ry="2.3"/><circle class="dot" cx="9.4" cy="11.6" r=".95"/><circle class="dot" cx="14.6" cy="11.6" r=".95"/><ellipse class="dot" cx="12" cy="14.9" rx="1.15" ry=".8"/></svg>';
+  // ---------- kids center ----------
+  // Chores travel between devices as a code or link the parent sends; there's no server.
+  const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const dowOf = d => (d.getDay() + 6) % 7;
+  const CADENCE = { week: "Every week", "2weeks": "Every other week", month: "Every month" };
+  function kidsData() {
+    if (!store.__kids || typeof store.__kids !== "object") store.__kids = {};
+    const k = store.__kids;
+    if (k.mode !== "parent") k.mode = "kid";
+    k.parent ||= {}; k.parent.kids ||= [];
+    k.kid ||= {}; k.kid.chores ||= []; k.kid.done ||= {}; k.kid.homework ||= [];
+    return k;
+  }
+  kidsData();
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function nextDue(sentAt, cadence) {
+    const d = new Date(sentAt);
+    if (cadence === "month") d.setMonth(d.getMonth() + 1);
+    else d.setDate(d.getDate() + (cadence === "2weeks" ? 14 : 7));
+    return d;
+  }
+  const isDue = (sentAt, cadence) => !!sentAt && Date.now() >= +nextDue(sentAt, cadence);
+  const shortDate = d => cap(MON3(d)) + " " + d.getDate();
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function encodeChores(kid) {
+    const json = JSON.stringify({ v: 1, name: kid.name, cadence: kid.cadence || "week", sentAt: kid.sentAt, chores: kid.chores.map(c => ({ id: c.id, text: c.text, days: c.days, t: c.t || "" })) });
+    return "SLATE-CHORES-" + btoa(unescape(encodeURIComponent(json))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function decodeChores(text) {
+    const m = String(text).match(/(?:SLATE-CHORES-|#chores-)([A-Za-z0-9_-]+)/);
+    if (!m) return null;
+    try {
+      let b = m[1].replace(/-/g, "+").replace(/_/g, "/"); while (b.length % 4) b += "=";
+      const d = JSON.parse(decodeURIComponent(escape(atob(b))));
+      return d && Array.isArray(d.chores) ? d : null;
+    } catch (e) { return null; }
+  }
+  function choreLink(code) {
+    if (window.claude || !/^https?:/.test(location.protocol)) return "";
+    return location.origin + location.pathname + "#chores-" + code.replace("SLATE-CHORES-", "");
+  }
+  function importChores(d) {
+    const c = kidsData().kid;
+    c.name = d.name || c.name || ""; c.chores = d.chores; c.cadence = d.cadence || "week";
+    c.sentAt = d.sentAt || Date.now(); c.receivedAt = Date.now();
+    save();
+  }
+
+  let kidDay = keyOf(today), selKid = null, lastCode = "";
+
+  function buildKids() {
+    const K = kidsData();
+    kidsPane.innerHTML = `
+      <div class="kc-top">
+        <div class="kc-hello">
+          <div class="kc-title">Kids Center</div>
+          <div class="kc-sub" id="kcSub"></div>
+        </div>
+        <div class="seg" role="tablist" aria-label="Who's using Slate">
+          <button type="button" role="tab" data-mode="kid" aria-selected="${K.mode === "kid"}">Kid</button>
+          <button type="button" role="tab" data-mode="parent" aria-selected="${K.mode === "parent"}">Parent</button>
+        </div>
+      </div>
+      <div class="kc-banner" id="kcBanner" hidden></div>
+      <div class="kc-body" id="kcBody"></div>`;
+    kidsPane.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+      if (K.mode === b.dataset.mode) return;
+      K.mode = b.dataset.mode; save();
+      kidsPane.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+      renderKidsBody(true);
+    }));
+    renderKidsBody(false);
+  }
+
+  function renderKidsBody(animate) {
+    const K = kidsData();
+    if (K.mode === "parent") renderParent(); else renderKid();
+    if (animate) staggerIn(kidsPane.querySelectorAll(".kc-body > .h-card"), 1, 0);
+  }
+
+  // ---- kid side ----
+  function renderKid() {
+    const c = kidsData().kid;
+    $("kcSub").textContent = c.name ? `Hi ${c.name}! Here's what's on your list.` : "Your chores and homework, all in one place.";
+    const banner = $("kcBanner");
+    if (c.sentAt && isDue(c.sentAt, c.cadence)) {
+      banner.hidden = false;
+      banner.innerHTML = `<span class="kc-bear" aria-hidden="true">${BEAR_ICON}</span><span>Your chores are due for an update. Ask your grown-up to send your new list.</span>`;
+    } else banner.hidden = true;
+    $("kcBody").innerHTML = `
+      <div class="h-card kc-card">
+        <div class="h-label"><span>Chores</span><button class="link" type="button" id="getChores">Get chores ›</button></div>
+        <div class="kc-week" id="kcWeek"></div>
+        <div class="kc-progress" id="kcProg"></div>
+        <div class="kc-list" id="kcChores"></div>
+      </div>
+      <div class="h-card kc-card">
+        <div class="h-label"><span>Homework</span><span id="hwCount"></span></div>
+        <div class="hw-form">
+          <input id="hwSubject" type="text" placeholder="Subject" aria-label="Subject" maxlength="30">
+          <input id="hwDue" type="date" aria-label="Due date">
+          <input id="hwText" type="text" placeholder="What do you have to do?" aria-label="Homework" enterkeyhint="done">
+          <button type="button" id="hwAdd">Add</button>
+        </div>
+        <div class="kc-list" id="hwList"></div>
+      </div>`;
+    $("getChores").addEventListener("click", () => openImport(""));
+    renderWeekStrip(); renderKidChores(); renderHomework();
+    const add = () => {
+      const text = $("hwText").value.trim(); if (!text) { $("hwText").focus(); return; }
+      c.homework.push({ id: uid(), subject: $("hwSubject").value.trim(), text, due: $("hwDue").value || "", done: false });
+      save(); $("hwText").value = ""; renderHomework(true); $("hwText").focus();
+    };
+    $("hwAdd").addEventListener("click", add);
+    $("hwText").addEventListener("keydown", e => { if (e.key === "Enter") add(); });
+  }
+  function renderWeekStrip() {
+    const c = kidsData().kid, strip = $("kcWeek"); strip.replaceChildren();
+    const s = weekStart(today);
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(s, i), key = keyOf(d);
+      const n = c.chores.filter(ch => ch.days.includes(i)).length;
+      const b = document.createElement("button"); b.type = "button";
+      b.className = "kc-day" + (key === kidDay ? " sel" : "") + (+d === +today ? " today" : "");
+      b.innerHTML = `<span>${DOW[i]}</span><b>${d.getDate()}</b><i${n ? "" : " hidden"}></i>`;
+      b.setAttribute("aria-label", `${DAYS[d.getDay()]}, ${n} chore${n === 1 ? "" : "s"}`);
+      b.addEventListener("click", () => { kidDay = key; renderWeekStrip(); renderKidChores(true); });
+      strip.appendChild(b);
+    }
+  }
+  function renderKidChores(animate) {
+    const c = kidsData().kid, list = $("kcChores"); list.replaceChildren();
+    const d = dateOf(kidDay), di = dowOf(d);
+    const done = c.done[kidDay] || [];
+    const chores = c.chores.filter(ch => ch.days.includes(di)).sort((a, b) => (done.includes(a.id) - done.includes(b.id)) || (a.t || "99").localeCompare(b.t || "99"));
+    const n = chores.filter(ch => done.includes(ch.id)).length;
+    $("kcProg").textContent = chores.length ? `${n} of ${chores.length} done ${+d === +today ? "today" : "on " + DAYS[d.getDay()]}` : "";
+    if (!c.chores.length) {
+      list.innerHTML = `<div class="kc-empty">No chores yet. When your grown-up sends your list, tap <b>Get chores</b> and paste it in.</div>`;
+      return;
+    }
+    if (!chores.length) { list.innerHTML = `<div class="kc-empty">No chores on ${DAYS[d.getDay()]}. Enjoy it!</div>`; return; }
+    chores.forEach(ch => {
+      const isDone = done.includes(ch.id);
+      const it = document.createElement("button"); it.type = "button";
+      it.className = "kc-item" + (isDone ? " done" : "");
+      it.innerHTML = `<span class="kc-check">${CHECK}</span><span class="kc-text"></span>${ch.t ? `<span class="kc-time">${fmtTime(ch.t)}</span>` : ""}`;
+      it.querySelector(".kc-text").textContent = ch.text;
+      it.setAttribute("aria-pressed", String(isDone));
+      it.addEventListener("click", () => {
+        const arr = c.done[kidDay] ||= [];
+        const i = arr.indexOf(ch.id); if (i > -1) arr.splice(i, 1); else arr.push(ch.id);
+        save(); it.classList.toggle("done", i === -1);
+        setTimeout(() => renderKidChores(), 420);
+      });
+      list.appendChild(it);
+    });
+    if (animate) staggerIn(list.children, 1, 0);
+    watchFade(list);
+  }
+  function dueLabel(due) {
+    if (!due) return "";
+    const d = dateOf(due), diff = Math.round((d - today) / 864e5);
+    if (diff < 0) return "Overdue";
+    if (diff === 0) return "Due today";
+    if (diff === 1) return "Due tomorrow";
+    return "Due " + DAYS[d.getDay()].slice(0, 3) + ", " + shortDate(d);
+  }
+  function renderHomework(animateFirst) {
+    const c = kidsData().kid, list = $("hwList"); list.replaceChildren();
+    const hw = [...c.homework].sort((a, b) => (a.done - b.done) || ((a.due || "9999") < (b.due || "9999") ? -1 : (a.due || "9999") > (b.due || "9999") ? 1 : 0));
+    const left = hw.filter(h => !h.done).length;
+    $("hwCount").textContent = hw.length ? `${left} left` : "";
+    if (!hw.length) { list.innerHTML = `<div class="kc-empty">Nothing yet. Add each assignment above so you don't forget it.</div>`; return; }
+    hw.forEach(h => {
+      const it = document.createElement("div");
+      const dl = dueLabel(h.due);
+      it.className = "kc-item hw" + (h.done ? " done" : "") + (dl === "Overdue" && !h.done ? " late" : "");
+      it.innerHTML = `<button type="button" class="kc-check" aria-label="Mark done">${CHECK}</button>
+        <span class="kc-text"><span class="hw-sub"></span><span class="hw-t"></span></span>
+        ${dl ? `<span class="kc-time">${dl}</span>` : ""}
+        <button type="button" class="x" aria-label="Delete">${X_ICON}</button>`;
+      it.querySelector(".hw-sub").textContent = h.subject || "";
+      it.querySelector(".hw-sub").hidden = !h.subject;
+      it.querySelector(".hw-t").textContent = h.text;
+      it.querySelector(".kc-check").addEventListener("click", () => { h.done = !h.done; save(); it.classList.toggle("done", h.done); setTimeout(() => renderHomework(), 420); });
+      it.querySelector(".x").addEventListener("click", () => {
+        c.homework.splice(c.homework.indexOf(h), 1); save();
+        it.animate([{ opacity: 1 }, { opacity: 0, transform: "translateX(20px)" }], { duration: 220, easing: EASE, fill: "forwards" }).onfinish = () => renderHomework();
+      });
+      list.appendChild(it);
+    });
+    if (animateFirst) { const first = [...list.children].find(x => !x.classList.contains("done")); first?.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 380, easing: EASE }); }
+    watchFade(list);
+  }
+  function openImport(prefill) {
+    $("kiInput").value = prefill || ""; $("kiStatus").textContent = ""; $("kiStatus").classList.remove("ok");
+    $("kidsImport").classList.add("open");
+    if (!prefill) setTimeout(() => $("kiInput").focus(), 300);
+  }
+  $("kiGet").addEventListener("click", () => {
+    const d = decodeChores($("kiInput").value);
+    if (!d) { $("kiStatus").textContent = "That doesn't look like a chore list. Ask your grown-up to send it again, then paste the whole thing."; return; }
+    importChores(d);
+    $("kiStatus").textContent = `Got ${d.chores.length} chore${d.chores.length === 1 ? "" : "s"}${d.name ? " for " + d.name : ""}!`; $("kiStatus").classList.add("ok");
+    setTimeout(() => { $("kidsImport").classList.remove("open"); if (view === "kids") { kidsData().mode = "kid"; save(); buildKids(); staggerIn(kidsPane.querySelectorAll(".h-card"), 1, 0); } }, 700);
+  });
+
+  // ---- parent side ----
+  function renderParent() {
+    const P = kidsData().parent;
+    $("kcSub").textContent = "Make a chore list for each kid and send it to their Slate.";
+    const due = P.kids.filter(k => isDue(k.sentAt, k.cadence));
+    const banner = $("kcBanner");
+    if (due.length) {
+      banner.hidden = false;
+      banner.innerHTML = `<span class="kc-bear" aria-hidden="true">${BEAR_ICON}</span><span>Time to update ${esc(due.map(k => k.name).join(" and "))}'s chores.</span>`;
+    } else banner.hidden = true;
+    if (!selKid || !P.kids.find(k => k.id === selKid)) selKid = (due[0] || P.kids[0] || {}).id || null;
+    $("kcBody").innerHTML = `
+      <div class="h-card kc-card kc-kids">
+        <div class="h-label"><span>Your kids</span></div>
+        <div class="kc-list" id="kidList"></div>
+        <div class="kc-add"><input id="kidName" type="text" placeholder="Add a kid's name" aria-label="Kid's name" maxlength="24" enterkeyhint="done"><button type="button" id="kidAdd">Add</button></div>
+        <button type="button" class="kc-notify" id="kcNotify" hidden>Turn on reminder notifications</button>
+      </div>
+      <div class="h-card kc-card kc-editor" id="kidEditor"></div>`;
+    renderKidList(); renderEditor();
+    const addKid = () => {
+      const name = $("kidName").value.trim(); if (!name) { $("kidName").focus(); return; }
+      const k = { id: uid(), name, chores: [], cadence: "week", sentAt: 0 };
+      P.kids.push(k); selKid = k.id; save(); $("kidName").value = ""; renderKidList(); renderEditor(true);
+    };
+    $("kidAdd").addEventListener("click", addKid);
+    $("kidName").addEventListener("keydown", e => { if (e.key === "Enter") addKid(); });
+    if ("Notification" in window && Notification.permission === "default" && !window.claude) {
+      $("kcNotify").hidden = false;
+      $("kcNotify").addEventListener("click", () => Notification.requestPermission().then(() => { $("kcNotify").hidden = true; }).catch(() => {}));
+    }
+  }
+  function renderKidList() {
+    const P = kidsData().parent, list = $("kidList"); list.replaceChildren();
+    if (!P.kids.length) { list.innerHTML = `<div class="kc-empty">Add your first kid below to start their chore list.</div>`; return; }
+    P.kids.forEach(k => {
+      const b = document.createElement("button"); b.type = "button";
+      const due = isDue(k.sentAt, k.cadence);
+      b.className = "kc-kid" + (k.id === selKid ? " sel" : "");
+      b.innerHTML = `<span class="kc-avatar">${esc(k.name.charAt(0).toUpperCase())}</span><span class="kc-text"><b></b><small></small></span>${due ? '<span class="kc-pill warn">Update due</span>' : ""}`;
+      b.querySelector("b").textContent = k.name;
+      b.querySelector("small").textContent = `${k.chores.length} chore${k.chores.length === 1 ? "" : "s"} · ` + (k.sentAt ? (due ? "Was due " + shortDate(nextDue(k.sentAt, k.cadence)) : "Next update " + shortDate(nextDue(k.sentAt, k.cadence))) : "Not sent yet");
+      b.addEventListener("click", () => { selKid = k.id; lastCode = ""; renderKidList(); renderEditor(true); });
+      list.appendChild(b);
+    });
+  }
+  function renderEditor(animate) {
+    const P = kidsData().parent, ed = $("kidEditor");
+    const k = P.kids.find(x => x.id === selKid);
+    if (!k) { ed.innerHTML = `<div class="h-label"><span>Chore list</span></div><div class="kc-empty">Add a kid on the left, then build their chore list here.</div>`; return; }
+    ed.innerHTML = `
+      <div class="h-label"><span>${esc(k.name)}'s chores</span><button class="link" type="button" id="kidDel">Remove ${esc(k.name)}</button></div>
+      <div class="kc-list ed-list" id="edList"></div>
+      <div class="kc-add"><input id="choreText" type="text" placeholder="Add a chore, like Feed the dog" aria-label="New chore" enterkeyhint="done"><button type="button" id="choreAdd">Add</button></div>
+      <div class="ed-foot">
+        <div class="ed-label">Update this list</div>
+        <div class="seg seg-wide" id="edCad">${Object.entries(CADENCE).map(([v, l]) => `<button type="button" data-cad="${v}" aria-selected="${(k.cadence || "week") === v}">${l}</button>`).join("")}</div>
+        <div class="ed-send">
+          <button type="button" class="kc-send" id="kidSend"${k.chores.length ? "" : " disabled"}>Send to ${esc(k.name)}</button>
+          <span class="ed-status" id="edStatus"></span>
+        </div>
+        <div class="ed-share" id="edShare" hidden>
+          <p>Send this to ${esc(k.name)}. On their Slate, they tap <b>Get chores</b> in the Kids Center and paste it in.</p>
+          <textarea id="edCode" rows="2" readonly aria-label="Chore list code"></textarea>
+          <div class="ed-share-btns">
+            <button type="button" id="edCopy">Copy</button>
+            <button type="button" id="edShareBtn" hidden>Share…</button>
+            <button type="button" id="edHere">Use on this iPad</button>
+          </div>
+        </div>
+      </div>`;
+    const status = () => { $("edStatus").textContent = k.sentAt ? `Sent ${shortDate(new Date(k.sentAt))}. ${isDue(k.sentAt, k.cadence) ? "Update is due now." : "Next update " + shortDate(nextDue(k.sentAt, k.cadence)) + "."}` : "Not sent yet."; };
+    status();
+    renderChoreRows(k);
+    const addChore = () => {
+      const text = $("choreText").value.trim(); if (!text) { $("choreText").focus(); return; }
+      k.chores.push({ id: uid(), text, days: [0, 1, 2, 3, 4, 5, 6], t: "" }); save();
+      $("choreText").value = ""; renderChoreRows(k, true); $("kidSend").disabled = false; renderKidList(); $("choreText").focus();
+    };
+    $("choreAdd").addEventListener("click", addChore);
+    $("choreText").addEventListener("keydown", e => { if (e.key === "Enter") addChore(); });
+    $("edCad").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      k.cadence = b.dataset.cad; save();
+      $("edCad").querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+      status(); renderKidList();
+    }));
+    $("kidDel").addEventListener("click", ev => {
+      const btn = ev.currentTarget;
+      if (btn.dataset.confirm !== "1") { btn.dataset.confirm = "1"; btn.textContent = "Tap again to remove"; setTimeout(() => { if (btn.isConnected) { btn.dataset.confirm = ""; btn.textContent = "Remove " + k.name; } }, 3000); return; }
+      P.kids.splice(P.kids.indexOf(k), 1); selKid = null; save(); renderParent();
+    });
+    $("kidSend").addEventListener("click", () => {
+      k.sentAt = Date.now(); save();
+      lastCode = encodeChores(k);
+      const link = choreLink(lastCode);
+      $("edCode").value = link || lastCode;
+      $("edShare").hidden = false;
+      $("edShareBtn").hidden = !navigator.share || !!window.claude;
+      status(); renderKidList();
+      $("edShare").animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 360, easing: EASE });
+    });
+    $("edCopy").addEventListener("click", () => {
+      const txt = $("edCode").value;
+      const fail = () => { $("edCode").select(); $("edStatus").textContent = "Copying was blocked. The code is selected, so copy it from the box."; };
+      try { navigator.clipboard.writeText(txt).then(() => { $("edStatus").textContent = "Copied. Paste it in a message to " + k.name + "."; }, fail); } catch (e) { fail(); }
+    });
+    $("edShareBtn").addEventListener("click", () => {
+      navigator.share({ title: k.name + "'s chores", text: "Your Slate chore list. Open Kids Center, tap Get chores, and paste this in:\n\n" + lastCode + (choreLink(lastCode) ? "\n\n" + choreLink(lastCode) : "") }).catch(() => {});
+    });
+    $("edHere").addEventListener("click", () => {
+      importChores(decodeChores(lastCode));
+      $("edStatus").textContent = `Loaded on this iPad. Switch to Kid to see ${k.name}'s chores.`;
+    });
+    if (animate) ed.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 380, easing: EASE });
+  }
+  function renderChoreRows(k, animateLast) {
+    const list = $("edList"); list.replaceChildren();
+    if (!k.chores.length) { list.innerHTML = `<div class="kc-empty">No chores yet. Add one below, then pick the days.</div>`; return; }
+    k.chores.forEach(ch => {
+      const row = document.createElement("div"); row.className = "ed-row";
+      row.innerHTML = `<div class="ed-top"><input class="ed-text" type="text" aria-label="Chore"><label class="ed-time"><span></span><input type="time" aria-label="Time (optional)"></label><button type="button" class="x" aria-label="Remove chore">${X_ICON}</button></div>
+        <div class="ed-days">${DOW.map((d, i) => `<button type="button" data-d="${i}" aria-pressed="${ch.days.includes(i)}">${d}</button>`).join("")}</div>`;
+      const ti = row.querySelector(".ed-text"); ti.value = ch.text;
+      ti.addEventListener("change", () => { const v = ti.value.trim(); if (v) { ch.text = v; save(); } else ti.value = ch.text; });
+      const tl = row.querySelector(".ed-time span"), tin = row.querySelector(".ed-time input");
+      const showT = () => { tl.textContent = ch.t ? fmtTime(ch.t) : "+ time"; tl.classList.toggle("none", !ch.t); };
+      tin.value = ch.t || ""; showT();
+      tin.addEventListener("change", () => { ch.t = tin.value || ""; save(); showT(); });
+      row.querySelectorAll(".ed-days button").forEach(b => b.addEventListener("click", () => {
+        const i = +b.dataset.d, at = ch.days.indexOf(i);
+        if (at > -1) { if (ch.days.length === 1) return; ch.days.splice(at, 1); } else { ch.days.push(i); ch.days.sort(); }
+        b.setAttribute("aria-pressed", String(at === -1)); save();
+      }));
+      row.querySelector(".x").addEventListener("click", () => {
+        k.chores.splice(k.chores.indexOf(ch), 1); save();
+        row.animate([{ opacity: 1 }, { opacity: 0, transform: "translateX(20px)" }], { duration: 220, easing: EASE, fill: "forwards" }).onfinish = () => { renderChoreRows(k); renderKidList(); $("kidSend").disabled = !k.chores.length; };
+      });
+      list.appendChild(row);
+    });
+    if (animateLast) { list.lastChild.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 360, easing: EASE }); list.scrollTop = list.scrollHeight; }
+    watchFade(list);
+  }
+
+  // ---- reminders when Slate opens ----
+  function choreReminders() {
+    const K = kidsData(), msgs = [];
+    const due = K.parent.kids.filter(k => isDue(k.sentAt, k.cadence));
+    if (due.length) msgs.push({ text: `Time to update ${due.map(k => k.name).join(" and ")}'s chores.`, action: "Update", go: () => { K.mode = "parent"; selKid = due[0].id; save(); view === "kids" ? buildKids() : switchView("kids"); } });
+    if (K.kid.sentAt && isDue(K.kid.sentAt, K.kid.cadence)) msgs.push({ text: "Your chores are due for an update. Ask your grown-up to send your new list.", action: "Open", go: () => { K.mode = "kid"; save(); view === "kids" ? buildKids() : switchView("kids"); } });
+    if (!msgs.length) return;
+    showToast(msgs[0]);
+    const tk = keyOf(today);
+    if (K.notified !== tk && "Notification" in window && Notification.permission === "granted") {
+      K.notified = tk; save();
+      const body = msgs.map(m => m.text).join(" ");
+      const opts = { body, icon: "icon-192.png", tag: "slate-chores" };
+      (navigator.serviceWorker && navigator.serviceWorker.ready ? navigator.serviceWorker.ready.then(r => r.showNotification("Slate", opts)) : Promise.reject()).catch(() => { try { new Notification("Slate", opts); } catch (e) {} });
+    }
+  }
+  let toastTimer;
+  function showToast(m) {
+    const t = $("toast");
+    t.innerHTML = `<span class="kc-bear" aria-hidden="true">${BEAR_ICON}</span><span class="tx"></span>${m.action ? `<button type="button" class="ta">${m.action}</button>` : ""}<button type="button" class="tc" aria-label="Dismiss">${X_ICON}</button>`;
+    t.querySelector(".tx").textContent = m.text;
+    t.querySelector(".ta")?.addEventListener("click", () => { hideToast(); m.go && m.go(); });
+    t.querySelector(".tc").addEventListener("click", hideToast);
+    t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 12000);
+  }
+  function hideToast() { $("toast").classList.remove("show"); }
+
   // ---------- back up / restore ----------
   const LS_KEYS = ["slate.avatar", "slate.theme", "slate.style", "slate.accents", "slate.colors", "slate.cal", "slate.view"];
   function backupText() {
@@ -2203,6 +2712,13 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     render(true);
     setTimeout(() => $("splash").remove(), 1000);
     if (!store.__feelings[keyOf(today)]) setTimeout(askFeeling, 1100);
+    setTimeout(choreReminders, 1600);
+    if (/^#chores-/.test(location.hash)) {
+      const code = "SLATE-CHORES-" + location.hash.slice(8);
+      try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+      kidsData().mode = "kid"; save();
+      setTimeout(() => { if (view !== "kids") switchView("kids"); setTimeout(() => openImport(code), 700); }, 1300);
+    }
   }, 2300);
 })();
 </script>
