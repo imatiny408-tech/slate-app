@@ -4,4 +4,5 @@
 - `src/slate.html` is also published as a Claude artifact. Keep it artifact-safe: no `<html>/<head>/<body>` tags, `<title>` and `<style>` at the top, no external hosts except Google Fonts and the allowed CDNs.
 - **Never break saved data.** Users' data is in localStorage under `slate.v1` (tasks per `YYYY-MM-DD`, plus `__routines`, `__ideas`, `__feelings`, `__categories`, `__kids`, `__seeded`) and `slate.avatar`, `slate.theme`, `slate.style`, `slate.accents`, `slate.colors`, `slate.cal`, `slate.view`. Don't rename or reset these keys. If the shape must change, add a migration that reads the old shape and upgrades it in place.
 - Don't reseed example data: seeding is guarded by `store.__seeded` and must stay that way.
+- Accounts and sync use Supabase project `vdryzddjkvalxjbmfshh` (table `public.slate_data`, one row per user, row-level security on). The app talks to it with plain `fetch` and the publishable key. `slate.session` and `slate.sync` in localStorage hold the sign-in and the last-synced marker; they are not part of backups. Sync is off inside the Claude preview.
 - Pushing to `main` deploys to GitHub Pages automatically.

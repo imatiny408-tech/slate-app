@@ -372,6 +372,22 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .month-foot { display: none; position: fixed; left: clamp(16px, 3vw, 40px); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); pointer-events: none; transition: opacity .4s ease; }
 #app:not(.b):not(.week):not(.month):not(.home):not(.kids) ~ .month-foot { display: block; }
 
+/* ---------- Account ---------- */
+.acct-seg { margin-bottom: 14px; }
+.apple-btn { width: 100%; height: 50px; border-radius: 25px; background: #000; color: #fff; font-size: 17px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; }
+:root[data-theme="dark"] .apple-btn { background: #fff; color: #000; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .apple-btn { background: #fff; color: #000; } }
+.apple-logo { font-family: -apple-system, system-ui, sans-serif; font-size: 20px; line-height: 1; margin-top: -3px; }
+.acct-or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; margin: 16px 0 14px; }
+.acct-or::before, .acct-or::after { content: ""; flex: 1; height: 1.5px; background: var(--line); }
+.acct-in { display: block; width: 100%; box-sizing: border-box; height: 48px; border: 0; border-radius: 24px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 18px; outline: none; margin-bottom: 10px; -webkit-user-select: text; user-select: text; }
+.acct-in::placeholder { color: var(--muted); }
+.acct-go { width: 100%; height: 50px; border-radius: 25px; background: var(--ink); color: var(--bg); font-size: 16px; margin-top: 4px; }
+.acct-go:disabled { opacity: .55; }
+.acct-forgot { display: block; margin: 14px auto 0; }
+.acct-email { font-size: 20px; margin: -6px 0 6px; overflow-wrap: anywhere; }
+.acct-note { margin: 12px 0 0; font-size: 13px; }
+
 /* ---------- Kids Center ---------- */
 .icon-btn .bg { fill: var(--card); transition: fill .35s ease; }
 .icon-btn.on .bg { fill: var(--ink); }
@@ -693,6 +709,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 <div class="sheet-wrap" id="settingsSheet">
   <div class="sheet">
     <h2>Settings</h2>
+    <button class="opt" id="acctOpt"><span>Account</span><span id="acctVal" style="color:var(--muted)">Sign in</span></button>
     <button class="opt" id="themeOpt"><span>Appearance</span><span id="themeVal" style="color:var(--muted)">System</span></button>
     <button class="opt" id="styleOpt"><span>Style</span><span id="styleVal" style="color:var(--muted)">Classic</span></button>
     <button class="opt" id="clearOpt"><span>Clear this day</span><span style="color:var(--muted)">›</span></button>
@@ -748,6 +765,47 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sheet-wrap" id="acctSheet">
+  <div class="sheet">
+    <h2>Your account</h2>
+    <div id="acctOut">
+      <p class="feel-hint">Sign in to save Slate to your account. Your data stays safe and follows you to any device you sign in on.</p>
+      <p class="feel-hint" id="acctOff" hidden>Sign-in works in the Slate app on your iPad, not in this preview.</p>
+      <div id="acctForm">
+        <button type="button" class="apple-btn" id="appleBtn"><span class="apple-logo" aria-hidden="true"></span>Continue with Apple</button>
+        <div class="acct-or"><span>or use a username</span></div>
+        <div class="seg seg-wide acct-seg" id="acctSeg"><button type="button" data-m="in">Sign in</button><button type="button" data-m="up">Create account</button></div>
+        <input class="acct-in" id="acctEmail2" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40">
+        <input class="acct-in" id="acctPass" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" enterkeyhint="go">
+        <button type="button" class="acct-go" id="acctGo">Sign in</button>
+        <button type="button" class="link acct-forgot" id="acctForgot" hidden>Forgot password?</button>
+        <p class="feel-hint bk-status" id="acctStatus" aria-live="polite"></p>
+      </div>
+    </div>
+    <div id="acctIn" hidden>
+      <p class="acct-email" id="acctEmail"></p>
+      <p class="feel-hint" id="acctSync" aria-live="polite"></p>
+      <div class="confirm-btns"><button type="button" id="acctSyncNow">Sync now</button><button type="button" id="acctOutBtn">Sign out</button></div>
+      <p class="feel-hint acct-note">Signing out keeps everything on this iPad.</p>
+    </div>
+    <button class="close" data-close>Done</button>
+  </div>
+</div>
+<div class="sheet-wrap" id="choiceSheet">
+  <div class="sheet">
+    <h2>Which Slate should we keep?</h2>
+    <p class="feel-hint" id="choiceText"></p>
+    <div class="confirm-btns"><button type="button" id="useAccount">Use my account's</button><button type="button" class="ink" id="useDevice">Use this iPad's</button></div>
+  </div>
+</div>
+<div class="sheet-wrap" id="pwSheet">
+  <div class="sheet">
+    <h2>Set a new password</h2>
+    <input class="acct-in" id="pwNew" type="password" placeholder="New password" aria-label="New password" autocomplete="new-password">
+    <p class="feel-hint bk-status" id="pwStatus" aria-live="polite"></p>
+    <div class="confirm-btns"><button type="button" data-close>Cancel</button><button type="button" class="ink" id="pwSave">Save password</button></div>
+  </div>
+</div>
 <div class="sheet-wrap" id="feelSheet">
   <div class="sheet">
     <h2>How are you feeling today?</h2>
@@ -1918,7 +1976,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
 
   function openSheet(el) { el.classList.add("open"); }
-  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport").forEach(w => w.addEventListener("click", e => {
+  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet").forEach(w => w.addEventListener("click", e => {
     if (e.target === w || e.target.closest("[data-close]")) w.classList.remove("open");
   }));
 
@@ -2772,8 +2830,253 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   document.addEventListener("dblclick", e => { if (!e.target.closest("input, textarea")) e.preventDefault(); }, { passive: false });
   ["gesturestart", "gesturechange"].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
 
+  // ---------- account & sync (Supabase) ----------
+  // One row per account in public.slate_data holds the same snapshot as a backup. Row-level security keeps it private.
+  const SB_URL = "https://vdryzddjkvalxjbmfshh.supabase.co";
+  const SB_KEY = "sb_publishable_P8YBRAZzS1p5i3tUI8r26Q_Ge4ri2Mr";
+  const CAN_SYNC = !window.claude && /^https?:/.test(location.protocol);
+  const readJSON = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || "null") || d; } catch (e) { return d; } };
+  const writeJSON = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  let session = readJSON("slate.session", null);
+  let syncMeta = readJSON("slate.sync", {});
+  let syncReady = false, syncBusy = false, lastSyncMsg = "";
+  const hashStr = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0; return s.length + ":" + (h >>> 0).toString(36); };
+  function snapshot() {
+    const extra = {};
+    LS_KEYS.forEach(k => { try { const v = localStorage.getItem(k); if (v != null) extra[k] = v; } catch (e) {} });
+    return { app: "slate", version: 1, store, extra };
+  }
+  const snapHash = () => hashStr(JSON.stringify(snapshot()));
+  // Usernames are stored as a placeholder address, since accounts need one; no email is ever sent there
+  const USER_DOMAIN = "@slate.example.com";
+  function authEmail(name) {
+    const u = name.trim().toLowerCase();
+    if (u.includes("@")) return u;
+    if (!/^[a-z0-9._]{3,20}$/.test(u)) return null;
+    return u + USER_DOMAIN;
+  }
+  const displayName = e => (e || "").endsWith(USER_DOMAIN) ? e.slice(0, -USER_DOMAIN.length) : (e || "");
+  function friendly(err) {
+    const m = String((err && err.msg) || err || "");
+    if (/invalid login/i.test(m)) return "That username and password don't match.";
+    if (/not confirmed/i.test(m)) return "This account isn't ready yet. Try again in a moment.";
+    if (/already registered|already exists/i.test(m)) return "That username is taken. Try another one.";
+    if (/provider is not enabled|unsupported provider/i.test(m)) return "Sign in with Apple isn't set up yet.";
+    if (/password.*(6|characters|short)/i.test(m)) return "Use a password with at least 6 characters.";
+    if (/valid email|invalid.*email/i.test(m)) return "That email address doesn't look right.";
+    if (/rate limit|too many/i.test(m)) return "Too many tries for now. Wait a few minutes and try again.";
+    if (/failed to fetch|network/i.test(m)) return "Slate can't reach the internet right now. Try again when you're online.";
+    return m || "Something went wrong. Try again.";
+  }
+  async function sbAuth(path, body, token, method) {
+    const r = await fetch(SB_URL + "/auth/v1/" + path, {
+      method: method || "POST",
+      headers: Object.assign({ apikey: SB_KEY, "Content-Type": "application/json" }, token ? { Authorization: "Bearer " + token } : {}),
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw { status: r.status, msg: j.msg || j.error_description || j.message || j.error || "Request failed" };
+    return j;
+  }
+  function setSession(j) {
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id };
+    writeJSON("slate.session", session);
+    updateAcctUI();
+  }
+  function signOutLocal(expired) {
+    session = null; writeJSON("slate.session", null); syncReady = false;
+    updateAcctUI();
+    if (expired) showToast({ text: "You were signed out. Sign in again to keep saving to your account." , action: "Sign in", go: openAccount });
+  }
+  async function getToken() {
+    if (!session) return null;
+    if (session.expires_at - 90 > Date.now() / 1000) return session.access_token;
+    try { setSession(await sbAuth("token?grant_type=refresh_token", { refresh_token: session.refresh_token })); return session.access_token; }
+    catch (e) { if (e && (e.status === 400 || e.status === 401)) { signOutLocal(true); return null; } return session.access_token; }
+  }
+  async function rest(method, query, body, extraHeaders) {
+    const token = await getToken(); if (!token) throw { msg: "signed out" };
+    const r = await fetch(SB_URL + "/rest/v1/slate_data" + (query || ""), {
+      method, headers: Object.assign({ apikey: SB_KEY, Authorization: "Bearer " + token, "Content-Type": "application/json" }, extraHeaders || {}),
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (r.status === 401) { signOutLocal(true); throw { msg: "signed out" }; }
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw { status: r.status, msg: j.message || "Sync failed" }; }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : null;
+  }
+  const pullRemote = async () => { const rows = await rest("GET", "?select=data,updated_at"); return rows && rows[0] ? rows[0] : null; };
+  async function pushLocal() {
+    const at = new Date().toISOString(), snap = snapshot(), h = hashStr(JSON.stringify(snap));
+    await rest("POST", "", { user_id: session.user_id, data: snap, updated_at: at }, { Prefer: "resolution=merge-duplicates,return=minimal" });
+    syncMeta = { user_id: session.user_id, updated_at: at, hash: h, syncedAt: Date.now() }; writeJSON("slate.sync", syncMeta);
+    setSyncMsg("Saved to your account");
+  }
+  function applyRemote(row) {
+    const d = row.data || {};
+    try {
+      localStorage.setItem(KEY, JSON.stringify(d.store || {}));
+      LS_KEYS.forEach(k => { if (d.extra && k in d.extra) localStorage.setItem(k, d.extra[k]); else localStorage.removeItem(k); });
+    } catch (e) { return; }
+    syncMeta = { user_id: session.user_id, updated_at: row.updated_at, hash: hashStr(JSON.stringify({ app: "slate", version: 1, store: d.store || {}, extra: d.extra || {} })), syncedAt: Date.now() };
+    writeJSON("slate.sync", syncMeta);
+    try { sessionStorage.setItem("slate.quick", "1"); } catch (e) {}
+    location.reload();
+  }
+  function setSyncMsg(m) { lastSyncMsg = m; const el = $("acctSync"); if (el) el.textContent = m + (syncMeta.syncedAt ? " · " + new Date(syncMeta.syncedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : ""); }
+
+  // Bring this device and the account together: on open, after sign-in, and when Slate comes back to the front
+  async function syncNow(firstSignIn) {
+    if (!CAN_SYNC || !session || syncBusy) return;
+    syncBusy = true; setSyncMsg("Syncing…");
+    try {
+      const remote = await pullRemote();
+      const localChanged = snapHash() !== syncMeta.hash;
+      const sameAccount = syncMeta.user_id === session.user_id;
+      if (!remote) { await pushLocal(); }
+      else if (!sameAccount || firstSignIn) {
+        if (hashStr(JSON.stringify(remote.data)) === snapHash()) { syncMeta = { user_id: session.user_id, updated_at: remote.updated_at, hash: snapHash(), syncedAt: Date.now() }; writeJSON("slate.sync", syncMeta); setSyncMsg("Up to date"); }
+        else { syncBusy = false; askWhichData(remote, "Your account already has Slate data, and this iPad has its own. Which one do you want to keep?"); return; }
+      }
+      else if (remote.updated_at !== syncMeta.updated_at) {
+        if (localChanged) { syncBusy = false; askWhichData(remote, "Slate changed on another device and on this iPad since the last sync. Which version do you want to keep?"); return; }
+        applyRemote(remote); return;
+      }
+      else if (localChanged) await pushLocal();
+      else setSyncMsg("Up to date");
+      syncReady = true;
+    } catch (e) {
+      if (e && e.msg !== "signed out") setSyncMsg(/fetch|network/i.test(String(e.msg)) || !navigator.onLine ? "Offline. Changes will save when you're back online." : "Couldn't sync: " + friendly(e));
+    }
+    syncBusy = false;
+  }
+  let pending = null;
+  function askWhichData(remote, text) {
+    pending = remote;
+    $("choiceText").textContent = text;
+    $("choiceSheet").classList.add("open");
+  }
+  $("useAccount").addEventListener("click", () => { $("choiceSheet").classList.remove("open"); if (pending) applyRemote(pending); });
+  $("useDevice").addEventListener("click", async () => {
+    $("choiceSheet").classList.remove("open"); pending = null;
+    try { await pushLocal(); syncReady = true; } catch (e) { setSyncMsg("Couldn't sync: " + friendly(e)); }
+  });
+  // Save changes to the account a few seconds after they happen
+  setInterval(() => {
+    if (!CAN_SYNC || !session || !syncReady || syncBusy || !navigator.onLine) return;
+    if (snapHash() === syncMeta.hash) return;
+    syncBusy = true;
+    pushLocal().catch(e => setSyncMsg(e && e.msg === "signed out" ? "" : "Couldn't save yet. Slate will keep trying.")).finally(() => { syncBusy = false; });
+  }, 4000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && session && Date.now() - (syncMeta.syncedAt || 0) > 30000) syncNow(); });
+  window.addEventListener("online", () => syncNow());
+
+  // ---- account screen ----
+  let acctMode = "in";
+  function updateAcctUI() {
+    $("acctVal").textContent = session ? displayName(session.email) || "Signed in" : "Sign in";
+    $("acctOut").hidden = !!session; $("acctIn").hidden = !session;
+    if (session) { $("acctEmail").textContent = displayName(session.email) || "Signed in with Apple"; setSyncMsg(lastSyncMsg || (syncMeta.syncedAt ? "Saved to your account" : "Not synced yet")); }
+  }
+  function setAcctMode(m) {
+    acctMode = m;
+    $("acctSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.m === m)));
+    $("acctGo").textContent = m === "in" ? "Sign in" : "Create account";
+    $("acctPass").setAttribute("autocomplete", m === "in" ? "current-password" : "new-password");
+    $("acctForgot").hidden = true;
+    acctStatus("");
+  }
+  const acctStatus = (m, ok) => { const s = $("acctStatus"); s.textContent = m; s.classList.toggle("ok", !!ok); };
+  function openAccount() {
+    $("settingsSheet").classList.remove("open");
+    updateAcctUI();
+    if (!CAN_SYNC) { $("acctOff").hidden = false; $("acctForm").hidden = true; }
+    $("acctSheet").classList.add("open");
+  }
+  $("acctOpt").addEventListener("click", openAccount);
+  // Sign in with Apple goes through Supabase and comes back here with the session in the address
+  $("appleBtn").addEventListener("click", async () => {
+    if (!CAN_SYNC) return;
+    acctStatus("Opening Apple…");
+    try {
+      const r = await fetch(SB_URL + "/auth/v1/settings", { headers: { apikey: SB_KEY } });
+      const st = await r.json();
+      if (!st.external || !st.external.apple) { acctStatus("Sign in with Apple isn't set up yet. Use a username for now."); return; }
+    } catch (e) { acctStatus(friendly({ msg: "failed to fetch" })); return; }
+    location.href = SB_URL + "/auth/v1/authorize?provider=apple&redirect_to=" + encodeURIComponent(location.origin + location.pathname);
+  });
+  $("acctSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => setAcctMode(b.dataset.m)));
+  const acctSubmit = async () => {
+    const raw = $("acctEmail2").value.trim(), password = $("acctPass").value;
+    if (!raw) { $("acctEmail2").focus(); return; }
+    const email = authEmail(raw);
+    if (!email) { acctStatus("Usernames are 3 to 20 letters or numbers, and can use . or _"); $("acctEmail2").focus(); return; }
+    if (!password) { $("acctPass").focus(); return; }
+    const btn = $("acctGo"); btn.disabled = true; acctStatus(acctMode === "in" ? "Signing in…" : "Creating your account…");
+    try {
+      if (acctMode === "in") {
+        setSession(await sbAuth("token?grant_type=password", { email, password }));
+        $("acctPass").value = ""; acctStatus("");
+        await syncNow(true);
+      } else {
+        const j = await sbAuth("signup?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email, password });
+        if (j.access_token) { setSession(j); $("acctPass").value = ""; await syncNow(true); }
+        else {
+          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; await syncNow(true); }
+          catch (e2) { setAcctMode("in"); acctStatus("Your account is made, but it isn't ready to sign in yet. Try signing in again in a moment."); }
+        }
+      }
+    } catch (e) { acctStatus(friendly(e)); }
+    btn.disabled = false;
+  };
+  $("acctGo").addEventListener("click", acctSubmit);
+  $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
+  $("acctForgot").addEventListener("click", async () => {
+    const email = $("acctEmail2").value.trim();
+    if (!email) { acctStatus("Type your email above first."); $("acctEmail2").focus(); return; }
+    try { await sbAuth("recover?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email }); acctStatus("Check your email for a link to set a new password.", true); }
+    catch (e) { acctStatus(friendly(e)); }
+  });
+  $("acctSyncNow").addEventListener("click", () => syncNow());
+  $("acctOutBtn").addEventListener("click", async () => {
+    const b = $("acctOutBtn");
+    if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Tap again to sign out"; setTimeout(() => { b.dataset.confirm = ""; b.textContent = "Sign out"; }, 3000); return; }
+    try { if (snapHash() !== syncMeta.hash) await pushLocal(); } catch (e) {}
+    const t = session && session.access_token;
+    signOutLocal(false); syncMeta = {}; writeJSON("slate.sync", null);
+    if (t) sbAuth("logout", null, t).catch(() => {});
+    b.dataset.confirm = ""; b.textContent = "Sign out";
+    setAcctMode("in");
+  });
+  // New password after tapping a reset link
+  $("pwSave").addEventListener("click", async () => {
+    const p = $("pwNew").value;
+    if (p.length < 6) { $("pwStatus").textContent = "Use at least 6 characters."; return; }
+    try { await sbAuth("user", { password: p }, await getToken(), "PUT"); $("pwSheet").classList.remove("open"); showToast({ text: "Your new password is saved." }); }
+    catch (e) { $("pwStatus").textContent = friendly(e); }
+  });
+  // Links from Slate emails land here with tokens in the address
+  function handleAuthLink() {
+    if (!/access_token=/.test(location.hash)) return false;
+    const q = new URLSearchParams(location.hash.slice(1));
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    const at = q.get("access_token"), rt = q.get("refresh_token");
+    if (!at || !rt) return false;
+    let user = {};
+    try { user = JSON.parse(atob(at.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))); } catch (e) {}
+    setSession({ access_token: at, refresh_token: rt, expires_in: +q.get("expires_in") || 3600, user: { email: user.email, id: user.sub } });
+    if (q.get("type") === "recovery") setTimeout(() => $("pwSheet").classList.add("open"), 2600);
+    else setTimeout(() => showToast({ text: "Your email is confirmed and you're signed in." }), 2600);
+    return true;
+  }
+  setAcctMode("in");
+  updateAcctUI();
+  if (CAN_SYNC) { const fromLink = handleAuthLink(); if (session) syncNow(fromLink); }
+
   // ---------- boot ----------
   render(false);
+  let quickBoot = false;
+  try { quickBoot = sessionStorage.getItem("slate.quick") === "1"; sessionStorage.removeItem("slate.quick"); } catch (e) {}
   setTimeout(() => {
     $("splash").classList.add("out");
     app.classList.add("in");
@@ -2787,6 +3090,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
       kidsData().mode = "kid"; save();
       setTimeout(() => { if (view !== "kids") switchView("kids"); setTimeout(() => openImport(code), 700); }, 1300);
     }
-  }, 2300);
+  }, quickBoot ? 0 : 2300);
 })();
 </script>
