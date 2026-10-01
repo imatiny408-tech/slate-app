@@ -388,7 +388,11 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .acct-email { font-size: 20px; margin: -6px 0 6px; overflow-wrap: anywhere; }
 .acct-note { margin: 12px 0 0; font-size: 13px; }
 .acct-phone-row { margin: 4px 0 14px; border-bottom: 1.5px solid var(--line); }
-.ph-code { letter-spacing: .3em; font-variant-numeric: tabular-nums; text-align: center; font-size: 22px; }
+.rq-hint { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
+.rq-kind { margin-bottom: 10px; }
+.rq-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rq-label { display: block; font-size: 13px; color: var(--muted); margin: 0 0 6px 6px; }
+#recSheet .sheet, #recSetSheet .sheet, #acctSheet .sheet { overflow-y: auto; scrollbar-width: none; }
 
 /* ---------- Kids Center ---------- */
 .icon-btn .bg { fill: var(--card); transition: fill .35s ease; }
@@ -779,7 +783,17 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         <div class="seg seg-wide acct-seg" id="acctSeg"><button type="button" data-m="in">Sign in</button><button type="button" data-m="up">Create account</button></div>
         <input class="acct-in" id="acctEmail2" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40">
         <input class="acct-in" id="acctPass" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" enterkeyhint="go">
-        <input class="acct-in" id="acctPhone" type="tel" placeholder="Phone number (optional, for password help)" aria-label="Phone number for password help" autocomplete="tel" hidden>
+        <div id="acctQ" hidden>
+          <p class="rq-hint">If you forget your password, you'll answer these to get back in.</p>
+          <div class="rq" id="upQ">
+          <div class="seg seg-wide rq-kind" id="upKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
+          <div class="rq-row"><input class="acct-in" id="upFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="upLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
+          <label class="rq-label" for="upBday">Birthday</label>
+          <input class="acct-in" id="upBday" type="date" aria-label="Birthday">
+          <div class="rq-row" id="upKidQ"><input class="acct-in" id="upPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="upPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
+          <input class="acct-in" id="upEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
+        </div>
+        </div>
         <button type="button" class="acct-go" id="acctGo">Sign in</button>
         <button type="button" class="link acct-forgot" id="acctForgot" hidden>Forgot password?</button>
         <p class="feel-hint bk-status" id="acctStatus" aria-live="polite"></p>
@@ -788,31 +802,46 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     <div id="acctIn" hidden>
       <p class="acct-email" id="acctEmail"></p>
       <p class="feel-hint" id="acctSync" aria-live="polite"></p>
-      <button type="button" class="opt acct-phone-row" id="acctPhoneRow"><span>Phone for password help</span><span id="acctPhoneVal" style="color:var(--muted)">Add</span></button>
+      <button type="button" class="opt acct-phone-row" id="acctRecRow"><span>Password help questions</span><span id="acctRecVal" style="color:var(--muted)">Set up</span></button>
       <div class="confirm-btns"><button type="button" id="acctSyncNow">Sync now</button><button type="button" id="acctOutBtn">Sign out</button></div>
       <p class="feel-hint acct-note">Signing out keeps everything on this iPad.</p>
     </div>
     <button class="close" data-close>Done</button>
   </div>
 </div>
-<div class="sheet-wrap" id="phoneSheet">
+<div class="sheet-wrap" id="recSheet">
   <div class="sheet">
-    <h2 id="phTitle">Reset your password</h2>
-    <p class="feel-hint" id="phHint"></p>
-    <div id="phStepPhone">
-      <input class="acct-in" id="phPhone" type="tel" placeholder="Phone number" aria-label="Phone number" autocomplete="tel" enterkeyhint="send">
-      <button type="button" class="acct-go" id="phSend">Text me a code</button>
-    </div>
-    <div id="phStepCode" hidden>
-      <input class="acct-in ph-code" id="phCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" aria-label="Code from the text message" enterkeyhint="done">
-      <button type="button" class="acct-go" id="phVerify">Continue</button>
-      <button type="button" class="link acct-forgot" id="phResend">Send a new code</button>
-    </div>
-    <div id="phStepPw" hidden>
-      <input class="acct-in" id="phPw" type="password" placeholder="New password" aria-label="New password" autocomplete="new-password" enterkeyhint="done">
-      <button type="button" class="acct-go" id="phSavePw">Save new password</button>
-    </div>
-    <p class="feel-hint bk-status" id="phStatus" aria-live="polite"></p>
+    <h2>Reset your password</h2>
+    <p class="feel-hint">Answer your questions exactly as you did when you made your account.</p>
+    <input class="acct-in" id="recUser" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="rq" id="recQ">
+          <div class="seg seg-wide rq-kind" id="recKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
+          <div class="rq-row"><input class="acct-in" id="recFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="recLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
+          <label class="rq-label" for="recBday">Birthday</label>
+          <input class="acct-in" id="recBday" type="date" aria-label="Birthday">
+          <div class="rq-row" id="recKidQ"><input class="acct-in" id="recPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="recPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
+          <input class="acct-in" id="recEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
+        </div>
+    <input class="acct-in" id="recPw" type="password" placeholder="New password" aria-label="New password" autocomplete="new-password">
+    <button type="button" class="acct-go" id="recGo">Reset password</button>
+    <p class="feel-hint bk-status" id="recStatus" aria-live="polite"></p>
+    <button class="close" data-close>Cancel</button>
+  </div>
+</div>
+<div class="sheet-wrap" id="recSetSheet">
+  <div class="sheet">
+    <h2>Password help questions</h2>
+    <p class="feel-hint">If you forget your password, you'll answer these to get back in. Only Slate's server can check them.</p>
+    <div class="rq" id="setQ">
+          <div class="seg seg-wide rq-kind" id="setKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
+          <div class="rq-row"><input class="acct-in" id="setFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="setLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
+          <label class="rq-label" for="setBday">Birthday</label>
+          <input class="acct-in" id="setBday" type="date" aria-label="Birthday">
+          <div class="rq-row" id="setKidQ"><input class="acct-in" id="setPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="setPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
+          <input class="acct-in" id="setEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
+        </div>
+    <button type="button" class="acct-go" id="setGo">Save answers</button>
+    <p class="feel-hint bk-status" id="setStatus" aria-live="polite"></p>
     <button class="close" data-close>Cancel</button>
   </div>
 </div>
@@ -2001,7 +2030,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
 
   function openSheet(el) { el.classList.add("open"); }
-  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet, #phoneSheet").forEach(w => w.addEventListener("click", e => {
+  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet, #recSheet, #recSetSheet").forEach(w => w.addEventListener("click", e => {
     if (e.target === w || e.target.closest("[data-close]")) w.classList.remove("open");
   }));
 
@@ -2887,10 +2916,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     if (/not confirmed/i.test(m)) return "This account isn't ready yet. Try again in a moment.";
     if (/already registered|already exists/i.test(m)) return "That username is taken. Try another one.";
     if (/provider is not enabled|unsupported provider/i.test(m)) return "Sign in with Apple isn't set up yet.";
-    if (/sms|phone provider|twilio|messagebird|vonage|textlocal|phone.*(disabled|not enabled)/i.test(m)) return "Text messages aren't set up for Slate yet, so codes can't be sent.";
-    if (/signups not allowed for otp|user not found/i.test(m)) return "No account has that phone number. Check it, or sign in with your username.";
-    if (/token has expired|invalid.*(otp|token)|otp.*(expired|invalid)/i.test(m)) return "That code didn't work. Check it, or send a new one.";
-    if (/phone.*(invalid|format)|invalid phone/i.test(m)) return "That phone number doesn't look right. Include the area code.";
     if (/password.*(6|characters|short)/i.test(m)) return "Use a password with at least 6 characters.";
     if (/valid email|invalid.*email/i.test(m)) return "That email address doesn't look right.";
     if (/rate limit|too many/i.test(m)) return "Too many tries for now. Wait a few minutes and try again.";
@@ -2908,7 +2933,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     return j;
   }
   function setSession(j) {
-    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id, phone: (j.user && j.user.phone) || (session && session.phone) || "" };
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id };
     writeJSON("slate.session", session);
     updateAcctUI();
   }
@@ -3005,7 +3030,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   function updateAcctUI() {
     $("acctVal").textContent = session ? displayName(session.email) || "Signed in" : "Sign in";
     $("acctOut").hidden = !!session; $("acctIn").hidden = !session;
-    if (session) { $("acctPhoneVal").textContent = session.phone ? prettyPhone(session.phone) : "Add"; }
     if (session) { $("acctEmail").textContent = displayName(session.email) || "Signed in with Apple"; setSyncMsg(lastSyncMsg || (syncMeta.syncedAt ? "Saved to your account" : "Not synced yet")); }
   }
   function setAcctMode(m) {
@@ -3014,13 +3038,13 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     $("acctGo").textContent = m === "in" ? "Sign in" : "Create account";
     $("acctPass").setAttribute("autocomplete", m === "in" ? "current-password" : "new-password");
     $("acctForgot").hidden = m !== "in";
-    $("acctPhone").hidden = m !== "up";
+    $("acctQ").hidden = m !== "up";
     acctStatus("");
   }
   const acctStatus = (m, ok) => { const s = $("acctStatus"); s.textContent = m; s.classList.toggle("ok", !!ok); };
   function openAccount() {
     $("settingsSheet").classList.remove("open");
-    updateAcctUI();
+    updateAcctUI(); refreshRecStatus();
     if (!CAN_SYNC) { $("acctOff").hidden = false; $("acctForm").hidden = true; }
     $("acctSheet").classList.add("open");
   }
@@ -3038,6 +3062,12 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
   $("acctSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => setAcctMode(b.dataset.m)));
   const acctSubmit = async () => {
+    let answers = null;
+    if (acctMode === "up") {
+      const a = upQ.read();
+      if (a.error && $("acctEmail2").value.trim() && $("acctPass").value) { acctStatus(a.error); upQ.focus(a.focus); return; }
+      answers = a.error ? null : a;
+    }
     const raw = $("acctEmail2").value.trim(), password = $("acctPass").value;
     if (!raw) { $("acctEmail2").focus(); return; }
     const email = authEmail(raw);
@@ -3047,98 +3077,99 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     try {
       if (acctMode === "in") {
         setSession(await sbAuth("token?grant_type=password", { email, password }));
-        $("acctPass").value = ""; acctStatus("");
+        $("acctPass").value = ""; acctStatus(""); refreshRecStatus();
         await syncNow(true);
       } else {
         const j = await sbAuth("signup?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email, password });
-        if (j.access_token) { setSession(j); $("acctPass").value = ""; await syncNow(true); }
+        if (j.access_token) { setSession(j); $("acctPass").value = ""; if (answers) { try { await saveAnswers(answers); upQ.clear(); } catch (e) {} } refreshRecStatus(); await syncNow(true); }
         else {
-          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; await syncNow(true); }
+          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; if (answers) { try { await saveAnswers(answers); upQ.clear(); } catch (e) {} } refreshRecStatus(); await syncNow(true); }
           catch (e2) { setAcctMode("in"); acctStatus("Your account is made, but it isn't ready to sign in yet. Try signing in again in a moment."); }
         }
       }
     } catch (e) { acctStatus(friendly(e)); }
     btn.disabled = false;
   };
-  $("acctGo").addEventListener("click", async () => {
-    const phone = acctMode === "up" ? $("acctPhone").value.trim() : "";
-    await acctSubmit();
-    if (session && phone) openPhone("add", phone, true);
-  });
+  $("acctGo").addEventListener("click", acctSubmit);
   $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
-  $("acctForgot").addEventListener("click", () => openPhone("reset"));
-  $("acctPhoneRow").addEventListener("click", () => openPhone("add", session && session.phone ? "+" + session.phone : ""));
+  $("acctForgot").addEventListener("click", openReset);
+  $("acctRecRow").addEventListener("click", openRecSet);
 
-  // ---- phone: add a number to an account, or reset a password by text ----
-  let phMode = "reset", phNumber = "";
-  function e164(raw) {
-    const t = raw.trim(), d = t.replace(/\D/g, "");
-    if (t.startsWith("+")) return d.length >= 8 ? "+" + d : null;
-    if (d.length === 10) return "+1" + d;
-    if (d.length === 11 && d[0] === "1") return "+" + d;
-    return null;
+  // ---- security questions: kids answer name, birthday and a parent's name; adults name, birthday and an email ----
+  function answerFields(pre) {
+    const kindBtns = $(pre + "Kind").querySelectorAll("button");
+    let kind = "kid";
+    const setKind = k => {
+      kind = k;
+      kindBtns.forEach(b => b.setAttribute("aria-selected", String(b.dataset.k === k)));
+      $(pre + "KidQ").hidden = k !== "kid"; $(pre + "Email").hidden = k !== "adult";
+    };
+    kindBtns.forEach(b => b.addEventListener("click", () => setKind(b.dataset.k)));
+    setKind("kid");
+    const v = id => $(pre + id).value.trim();
+    return {
+      setKind,
+      clear() { ["First", "Last", "Bday", "PFirst", "PLast", "Email"].forEach(id => $(pre + id).value = ""); },
+      read() {
+        if (!v("First") || !v("Last")) return { error: "Enter a first and last name.", focus: v("First") ? "Last" : "First" };
+        if (!v("Bday")) return { error: "Enter a birthday.", focus: "Bday" };
+        if (kind === "kid" && (!v("PFirst") || !v("PLast"))) return { error: "Enter a parent's first and last name.", focus: v("PFirst") ? "PLast" : "PFirst" };
+        if (kind === "adult" && !/^\S+@\S+\.\S+$/.test(v("Email"))) return { error: "Enter an email address.", focus: "Email" };
+        return { kind, name: v("First") + " " + v("Last"), birthday: v("Bday"), extra: kind === "kid" ? v("PFirst") + " " + v("PLast") : v("Email") };
+      },
+      focus(id) { $(pre + id).focus(); }
+    };
   }
-  const prettyPhone = p => { const d = String(p || "").replace(/\D/g, ""); return d.length === 11 && d[0] === "1" ? `(${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7)}` : (d ? "+" + d : ""); };
-  const phStatus = (m, ok) => { $("phStatus").textContent = m; $("phStatus").classList.toggle("ok", !!ok); };
-  function phStep(step) {
-    $("phStepPhone").hidden = step !== "phone"; $("phStepCode").hidden = step !== "code"; $("phStepPw").hidden = step !== "pw";
-    const f = { phone: "phPhone", code: "phCode", pw: "phPw" }[step];
-    setTimeout(() => $(f).focus(), 250);
+  const upQ = answerFields("up"), recQ = answerFields("rec"), setQ = answerFields("set");
+  async function rpc(fn, body, signedIn) {
+    const headers = { apikey: SB_KEY, "Content-Type": "application/json" };
+    if (signedIn) { const t = await getToken(); if (!t) throw { msg: "signed out" }; headers.Authorization = "Bearer " + t; }
+    const r = await fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers, body: JSON.stringify(body || {}) });
+    const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) { j = txt; }
+    if (!r.ok) throw { status: r.status, msg: (j && (j.message || j.msg)) || "Request failed" };
+    return j;
   }
-  function openPhone(mode, prefill, autoSend) {
-    if (!CAN_SYNC) return;
-    phMode = mode;
-    $("phTitle").textContent = mode === "reset" ? "Reset your password" : "Phone for password help";
-    $("phHint").textContent = mode === "reset"
-      ? "Enter the phone number on your account. We'll text you a code so you can choose a new password."
-      : "If you ever forget your password, Slate can text a code to this number.";
-    $("phPhone").value = prefill || ""; $("phCode").value = ""; $("phPw").value = ""; phStatus("");
-    $("acctSheet").classList.remove("open");
-    $("phoneSheet").classList.add("open");
-    phStep("phone");
-    if (autoSend && prefill) sendCode();
+  const saveAnswers = a => rpc("set_recovery_answers", { p_kind: a.kind, p_name: a.name, p_birthday: a.birthday, p_extra: a.extra }, true);
+  async function refreshRecStatus() {
+    if (!session) return;
+    try { const k = await rpc("has_recovery_answers", {}, true); $("acctRecVal").textContent = k ? "Set" : "Set up"; } catch (e) {}
   }
-  async function sendCode() {
-    const p = e164($("phPhone").value);
-    if (!p) { phStatus("Enter the full phone number, with area code."); $("phPhone").focus(); return; }
-    phNumber = p; phStatus("Sending…");
+  function openReset() {
+    $("recUser").value = $("acctEmail2").value.trim(); recQ.clear(); $("recPw").value = ""; $("recStatus").textContent = ""; $("recStatus").classList.remove("ok");
+    $("acctSheet").classList.remove("open"); $("recSheet").classList.add("open");
+    setTimeout(() => ($("recUser").value ? recQ.focus("First") : $("recUser").focus()), 300);
+  }
+  $("recGo").addEventListener("click", async () => {
+    const st = (m, ok) => { $("recStatus").textContent = m; $("recStatus").classList.toggle("ok", !!ok); };
+    const email = authEmail($("recUser").value);
+    if (!email) { st("Enter your username."); $("recUser").focus(); return; }
+    const a = recQ.read(); if (a.error) { st(a.error); recQ.focus(a.focus); return; }
+    const pw = $("recPw").value; if (pw.length < 6) { st("Choose a new password with at least 6 characters."); $("recPw").focus(); return; }
+    const btn = $("recGo"); btn.disabled = true; st("Checking your answers…");
     try {
-      if (phMode === "reset") await sbAuth("otp", { phone: p, create_user: false });
-      else await sbAuth("user", { phone: p }, await getToken(), "PUT");
-      phStatus("We texted a code to " + prettyPhone(p) + ".", true); phStep("code");
-    } catch (e) { phStatus(friendly(e)); }
+      const res = await rpc("reset_password_with_answers", { p_email: email, p_name: a.name, p_birthday: a.birthday, p_extra: a.extra, p_new_password: pw });
+      if (res === "ok") {
+        setSession(await sbAuth("token?grant_type=password", { email, password: pw }));
+        $("recSheet").classList.remove("open"); showToast({ text: "Your new password is saved, and you're signed in." });
+        syncNow(true);
+      } else if (res === "locked") st("Too many tries. Wait 15 minutes, then try again.");
+      else if (res === "short") st("Choose a new password with at least 6 characters.");
+      else st("Those answers don't match what's on file. Check the spelling and the birthday, then try again.");
+    } catch (e) { st(friendly(e)); }
+    btn.disabled = false;
+  });
+  function openRecSet() {
+    setQ.clear(); $("setStatus").textContent = ""; $("setStatus").classList.remove("ok");
+    $("acctSheet").classList.remove("open"); $("recSetSheet").classList.add("open");
   }
-  $("phSend").addEventListener("click", sendCode);
-  $("phPhone").addEventListener("keydown", e => { if (e.key === "Enter") sendCode(); });
-  $("phResend").addEventListener("click", () => { phStep("phone"); sendCode(); });
-  async function verifyCode() {
-    const token = $("phCode").value.replace(/\D/g, "");
-    if (token.length < 6) { phStatus("Enter the 6-digit code from the text."); return; }
-    phStatus("Checking…");
-    try {
-      const j = await sbAuth("verify", { type: phMode === "reset" ? "sms" : "phone_change", phone: phNumber, token }, phMode === "add" ? await getToken() : null);
-      if (phMode === "reset") { if (j.access_token) setSession(j); phStatus(""); phStep("pw"); }
-      else {
-        if (j.access_token) setSession(j); else if (session) { session.phone = phNumber.replace("+", ""); writeJSON("slate.session", session); }
-        $("phoneSheet").classList.remove("open"); updateAcctUI(); showToast({ text: "Phone number saved for password help." });
-      }
-    } catch (e) { phStatus(friendly(e)); }
-  }
-  $("phVerify").addEventListener("click", verifyCode);
-  $("phCode").addEventListener("keydown", e => { if (e.key === "Enter") verifyCode(); });
-  $("phCode").addEventListener("input", () => { if ($("phCode").value.replace(/\D/g, "").length === 6) verifyCode(); });
-  async function saveNewPw() {
-    const p = $("phPw").value;
-    if (p.length < 6) { phStatus("Use at least 6 characters."); return; }
-    try {
-      await sbAuth("user", { password: p }, await getToken(), "PUT");
-      $("phoneSheet").classList.remove("open");
-      showToast({ text: "Your new password is saved, and you're signed in." });
-      updateAcctUI(); syncNow(true);
-    } catch (e) { phStatus(friendly(e)); }
-  }
-  $("phSavePw").addEventListener("click", saveNewPw);
-  $("phPw").addEventListener("keydown", e => { if (e.key === "Enter") saveNewPw(); });
+  $("setGo").addEventListener("click", async () => {
+    const st = (m, ok) => { $("setStatus").textContent = m; $("setStatus").classList.toggle("ok", !!ok); };
+    const a = setQ.read(); if (a.error) { st(a.error); setQ.focus(a.focus); return; }
+    try { await saveAnswers(a); $("recSetSheet").classList.remove("open"); $("acctRecVal").textContent = "Set"; showToast({ text: "Your password help answers are saved." }); }
+    catch (e) { st(friendly(e)); }
+  });
+
+
   $("acctSyncNow").addEventListener("click", () => syncNow());
   $("acctOutBtn").addEventListener("click", async () => {
     const b = $("acctOutBtn");
