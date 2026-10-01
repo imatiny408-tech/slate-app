@@ -439,6 +439,10 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .kc-add { display: flex; gap: 8px; margin-top: 12px; }
 .kc-add input { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 22px; background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; padding: 0 16px; outline: none; }
 .kc-add input::placeholder { color: var(--muted); }
+.kc-add button:disabled, .kc-add input:disabled { opacity: .45; }
+.kc-chore { cursor: pointer; }
+.kc-mine { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--purple); background: var(--purple-soft); padding: 4px 9px; border-radius: 999px; flex: 0 0 auto; }
+.kc-own-note { color: var(--muted); font-size: 13px; margin-top: 8px; padding-left: 4px; }
 .kc-kid { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border-radius: 30px; background: var(--bg); text-align: left; width: 100%; box-sizing: border-box; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .25s ease; flex: 0 0 auto; }
 .kc-kid.sel { box-shadow: inset 0 0 0 1.5px var(--ink); }
 .kc-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--purple-soft); color: var(--purple); display: grid; place-items: center; font-size: 17px; flex: 0 0 auto; }
@@ -2268,13 +2272,15 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const dowOf = d => (d.getDay() + 6) % 7;
   const CADENCE = { week: "Every week", "2weeks": "Every other week", month: "Every month" };
+  const OWN_MAX = 5;
+  const allChores = c => [...c.chores, ...c.own];
   const SUBJECTS = ["Math", "Reading", "Writing", "Science", "Social Studies", "Spelling", "Art", "Music"];
   function kidsData() {
     if (!store.__kids || typeof store.__kids !== "object") store.__kids = {};
     const k = store.__kids;
     if (k.mode !== "parent") k.mode = "kid";
     k.parent ||= {}; k.parent.kids ||= [];
-    k.kid ||= {}; k.kid.chores ||= []; k.kid.done ||= {}; k.kid.homework ||= [];
+    k.kid ||= {}; k.kid.chores ||= []; k.kid.own ||= []; k.kid.done ||= {}; k.kid.homework ||= [];
     if (!Array.isArray(k.kid.subjects)) k.kid.subjects = SUBJECTS.slice();
     return k;
   }
@@ -2361,6 +2367,8 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         <div class="kc-week" id="kcWeek"></div>
         <div class="kc-progress" id="kcProg"></div>
         <div class="kc-list" id="kcChores"></div>
+        <div class="kc-add kc-own"><input id="ownText" type="text" placeholder="Add your own chore" aria-label="Add your own chore" maxlength="40" enterkeyhint="done"><button type="button" id="ownAdd">Add</button></div>
+        <div class="kc-own-note" id="ownNote"></div>
       </div>
       <div class="h-card kc-card">
         <div class="h-label"><span>Homework</span><span id="hwCount"></span></div>
@@ -2376,6 +2384,14 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     $("getChores").addEventListener("click", () => openImport(""));
     renderWeekStrip(); renderKidChores(); renderHomework();
     fillSubjects(c.lastSubject); fillDueDays();
+    const addOwn = () => {
+      if (c.own.length >= OWN_MAX) return;
+      const text = $("ownText").value.trim(); if (!text) { $("ownText").focus(); return; }
+      c.own.push({ id: "own-" + uid(), text, days: [0, 1, 2, 3, 4, 5, 6], t: "", own: true }); save();
+      $("ownText").value = ""; renderWeekStrip(); renderKidChores(true); $("ownText").focus();
+    };
+    $("ownAdd").addEventListener("click", addOwn);
+    $("ownText").addEventListener("keydown", e => { if (e.key === "Enter") addOwn(); });
     $("hwSubject").addEventListener("change", () => {
       if ($("hwSubject").value === "__add") {
         $("hwNewSub").hidden = false; $("hwSubName").value = ""; setTimeout(() => $("hwSubName").focus(), 30);
@@ -2403,7 +2419,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     const s = weekStart(today);
     for (let i = 0; i < 7; i++) {
       const d = addDays(s, i), key = keyOf(d);
-      const n = c.chores.filter(ch => ch.days.includes(i)).length;
+      const n = allChores(c).filter(ch => ch.days.includes(i)).length;
       const b = document.createElement("button"); b.type = "button";
       b.className = "kc-day" + (key === kidDay ? " sel" : "") + (+d === +today ? " today" : "");
       b.innerHTML = `<span>${DOW[i]}</span><b>${d.getDate()}</b><i${n ? "" : " hidden"}></i>`;
@@ -2416,21 +2432,26 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     const c = kidsData().kid, list = $("kcChores"); list.replaceChildren();
     const d = dateOf(kidDay), di = dowOf(d);
     const done = c.done[kidDay] || [];
-    const chores = c.chores.filter(ch => ch.days.includes(di)).sort((a, b) => (done.includes(a.id) - done.includes(b.id)) || (a.t || "99").localeCompare(b.t || "99"));
+    updateOwnNote(c);
+    const chores = allChores(c).filter(ch => ch.days.includes(di)).sort((a, b) => (done.includes(a.id) - done.includes(b.id)) || (a.t || "99").localeCompare(b.t || "99"));
     const n = chores.filter(ch => done.includes(ch.id)).length;
     $("kcProg").textContent = chores.length ? `${n} of ${chores.length} done ${+d === +today ? "today" : "on " + DAYS[d.getDay()]}` : "";
-    if (!c.chores.length) {
-      list.innerHTML = `<div class="kc-empty">No chores yet. When your grown-up sends your list, tap <b>Get chores</b> and paste it in.</div>`;
+    if (!allChores(c).length) {
+      list.innerHTML = `<div class="kc-empty">No chores yet. When your grown-up sends your list, tap <b>Get chores</b> and paste it in. You can also add up to ${OWN_MAX} of your own below.</div>`;
       return;
     }
     if (!chores.length) { list.innerHTML = `<div class="kc-empty">No chores on ${DAYS[d.getDay()]}. Enjoy it!</div>`; return; }
     chores.forEach(ch => {
       const isDone = done.includes(ch.id);
-      const it = document.createElement("button"); it.type = "button";
-      it.className = "kc-item" + (isDone ? " done" : "");
-      it.innerHTML = `<span class="kc-check">${CHECK}</span><span class="kc-text"></span>${ch.t ? `<span class="kc-time">${fmtTime(ch.t)}</span>` : ""}`;
+      const it = document.createElement("div");
+      it.className = "kc-item kc-chore" + (isDone ? " done" : "");
+      it.innerHTML = `<button type="button" class="kc-check" aria-label="Done" aria-pressed="${isDone}">${CHECK}</button><span class="kc-text"></span>${ch.own ? '<span class="kc-mine">Mine</span>' : ""}${ch.t ? `<span class="kc-time">${fmtTime(ch.t)}</span>` : ""}${ch.own ? `<button type="button" class="x" aria-label="Remove ${esc(ch.text)}">${X_ICON}</button>` : ""}`;
       it.querySelector(".kc-text").textContent = ch.text;
-      it.setAttribute("aria-pressed", String(isDone));
+      if (ch.own) it.querySelector(".x").addEventListener("click", ev => {
+        ev.stopPropagation();
+        c.own.splice(c.own.indexOf(ch), 1); save();
+        it.animate([{ opacity: 1 }, { opacity: 0, transform: "translateX(20px)" }], { duration: 220, easing: EASE, fill: "forwards" }).onfinish = () => { renderWeekStrip(); renderKidChores(); };
+      });
       it.addEventListener("click", () => {
         const arr = c.done[kidDay] ||= [];
         const i = arr.indexOf(ch.id); if (i > -1) arr.splice(i, 1); else arr.push(ch.id);
@@ -2457,6 +2478,12 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     }
     sel.innerHTML = opts.join("");
     sel.value = keyOf(today);
+  }
+  function updateOwnNote(c) {
+    const left = OWN_MAX - c.own.length, full = left <= 0;
+    $("ownText").disabled = full; $("ownAdd").disabled = full;
+    $("ownText").placeholder = full ? "You've added all 5 of your own" : "Add your own chore";
+    $("ownNote").textContent = full ? "Remove one of yours to add a different chore." : `You can add ${left} more of your own. They show up every day.`;
   }
   function dueLabel(due) {
     if (!due) return "";
