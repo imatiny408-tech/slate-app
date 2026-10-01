@@ -389,7 +389,12 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 .acct-note { margin: 12px 0 0; font-size: 13px; }
 .acct-phone-row { margin: 4px 0 14px; border-bottom: 1.5px solid var(--line); }
 .rq-hint { color: var(--muted); font-size: 14px; margin: 6px 0 10px; }
-.rq-kind { margin-bottom: 10px; }
+.rq-select { -webkit-appearance: none; appearance: none; cursor: pointer; }
+.rq-note { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 20px; background: color-mix(in srgb, var(--warn) 12%, transparent); margin: 4px 0 14px; }
+.rq-note p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink); }
+.rq-note b { font-weight: 600; }
+.rq-note-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--warn); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 700; flex: 0 0 auto; margin-top: 1px; }
+.rq-label { margin-top: 4px; }
 .rq-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .rq-label { display: block; font-size: 13px; color: var(--muted); margin: 0 0 6px 6px; }
 #recSheet .sheet, #recSetSheet .sheet, #acctSheet .sheet { overflow-y: auto; scrollbar-width: none; }
@@ -783,17 +788,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         <div class="seg seg-wide acct-seg" id="acctSeg"><button type="button" data-m="in">Sign in</button><button type="button" data-m="up">Create account</button></div>
         <input class="acct-in" id="acctEmail2" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40">
         <input class="acct-in" id="acctPass" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" enterkeyhint="go">
-        <div id="acctQ" hidden>
-          <p class="rq-hint">If you forget your password, you'll answer these to get back in.</p>
-          <div class="rq" id="upQ">
-          <div class="seg seg-wide rq-kind" id="upKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
-          <div class="rq-row"><input class="acct-in" id="upFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="upLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
-          <label class="rq-label" for="upBday">Birthday</label>
-          <input class="acct-in" id="upBday" type="date" aria-label="Birthday">
-          <div class="rq-row" id="upKidQ"><input class="acct-in" id="upPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="upPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
-          <input class="acct-in" id="upEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
-        </div>
-        </div>
         <button type="button" class="acct-go" id="acctGo">Sign in</button>
         <button type="button" class="link acct-forgot" id="acctForgot" hidden>Forgot password?</button>
         <p class="feel-hint bk-status" id="acctStatus" aria-live="polite"></p>
@@ -812,16 +806,16 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 <div class="sheet-wrap" id="recSheet">
   <div class="sheet">
     <h2 id="recTitle">Reset your password</h2>
-    <p class="feel-hint" id="recHint">Answer your questions exactly as you did when you made your account.</p>
+    <p class="feel-hint" id="recHint">Answer your security questions, then choose a new password.</p>
     <input class="acct-in" id="recUser" type="text" placeholder="Username" aria-label="Username" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
     <div class="rq" id="recQ">
-          <div class="seg seg-wide rq-kind" id="recKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
-          <div class="rq-row"><input class="acct-in" id="recFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="recLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
-          <label class="rq-label" for="recBday">Birthday</label>
-          <input class="acct-in" id="recBday" type="date" aria-label="Birthday">
-          <div class="rq-row" id="recKidQ"><input class="acct-in" id="recPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="recPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
-          <input class="acct-in" id="recEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
-        </div>
+      <label class="rq-label" for="recState">What state were you born in?</label>
+      <select class="acct-in rq-select" id="recState"><option value="">Choose a state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>District of Columbia</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option><option>Puerto Rico</option><option>Outside the US</option></select>
+      <label class="rq-label" for="recFood">What is your favorite food of all time?</label>
+      <input class="acct-in" id="recFood" type="text" placeholder="Favorite food" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <label class="rq-label" for="recSecret">Make up a secret word only you know</label>
+      <input class="acct-in" id="recSecret" type="text" placeholder="Secret word" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
     <input class="acct-in" id="recPw" type="password" placeholder="New password" aria-label="New password" autocomplete="new-password">
     <button type="button" class="acct-go" id="recGo">Reset password</button>
     <p class="feel-hint bk-status" id="recStatus" aria-live="polite"></p>
@@ -831,18 +825,22 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
 <div class="sheet-wrap" id="recSetSheet">
   <div class="sheet">
     <h2>Password help questions</h2>
-    <p class="feel-hint">If you forget your password, you'll answer these to get back in. Only Slate's server can check them.</p>
+    <p class="feel-hint" id="setHint">If you ever forget your password, you'll answer these to get back in. Answers are scrambled, so nobody can read them, not even Slate.</p>
     <div class="rq" id="setQ">
-          <div class="seg seg-wide rq-kind" id="setKind"><button type="button" data-k="kid" aria-selected="true">Kid</button><button type="button" data-k="adult" aria-selected="false">Adult</button></div>
-          <div class="rq-row"><input class="acct-in" id="setFirst" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name"><input class="acct-in" id="setLast" type="text" placeholder="Last name" aria-label="Last name" autocomplete="family-name"></div>
-          <label class="rq-label" for="setBday">Birthday</label>
-          <input class="acct-in" id="setBday" type="date" aria-label="Birthday">
-          <div class="rq-row" id="setKidQ"><input class="acct-in" id="setPFirst" type="text" placeholder="Parent's first name" aria-label="Parent's first name"><input class="acct-in" id="setPLast" type="text" placeholder="Parent's last name" aria-label="Parent's last name"></div>
-          <input class="acct-in" id="setEmail" type="email" placeholder="Email address" aria-label="Email address" autocomplete="email" autocapitalize="off" spellcheck="false" hidden>
-        </div>
+      <label class="rq-label" for="setState">What state were you born in?</label>
+      <select class="acct-in rq-select" id="setState"><option value="">Choose a state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>District of Columbia</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option><option>Puerto Rico</option><option>Outside the US</option></select>
+      <label class="rq-label" for="setFood">What is your favorite food of all time?</label>
+      <input class="acct-in" id="setFood" type="text" placeholder="Favorite food" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <label class="rq-label" for="setSecret">Make up a secret word only you know</label>
+      <input class="acct-in" id="setSecret" type="text" placeholder="Secret word" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="rq-note" role="note">
+      <span class="rq-note-icon" aria-hidden="true">!</span>
+      <p><b>Use answers you'll remember.</b> Spelling counts, but capital letters don't. Take a screenshot of your answers before you save, and keep it somewhere safe. If you forget your password and these answers, Slate can't get your account back.</p>
+    </div>
     <button type="button" class="acct-go" id="setGo">Save answers</button>
     <p class="feel-hint bk-status" id="setStatus" aria-live="polite"></p>
-    <button class="close" data-close>Cancel</button>
+    <button class="close" id="setLater" data-close>Cancel</button>
   </div>
 </div>
 <div class="sheet-wrap" id="choiceSheet">
@@ -2030,7 +2028,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
 
   function openSheet(el) { el.classList.add("open"); }
-  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet, #recSheet, #recSetSheet").forEach(w => w.addEventListener("click", e => {
+  document.querySelectorAll("#statsSheet, #settingsSheet, #backupSheet, #mdSheet, #kidsImport, #acctSheet, #pwSheet, #recSheet").forEach(w => w.addEventListener("click", e => {
     if (e.target === w || e.target.closest("[data-close]")) w.classList.remove("open");
   }));
 
@@ -2933,7 +2931,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     return j;
   }
   function setSession(j) {
-    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id };
+    session = { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), email: j.user && j.user.email, user_id: j.user && j.user.id, created_at: (j.user && j.user.created_at) || (session && session.created_at) || new Date().toISOString() };
     writeJSON("slate.session", session);
     updateAcctUI();
   }
@@ -3038,7 +3036,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     $("acctGo").textContent = m === "in" ? "Sign in" : "Create account";
     $("acctPass").setAttribute("autocomplete", m === "in" ? "current-password" : "new-password");
     $("acctForgot").hidden = m !== "in";
-    $("acctQ").hidden = m !== "up";
     acctStatus("");
   }
   const acctStatus = (m, ok) => { const s = $("acctStatus"); s.textContent = m; s.classList.toggle("ok", !!ok); };
@@ -3062,12 +3059,6 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   });
   $("acctSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => setAcctMode(b.dataset.m)));
   const acctSubmit = async () => {
-    let answers = null;
-    if (acctMode === "up") {
-      const a = upQ.read();
-      if (a.error && $("acctEmail2").value.trim() && $("acctPass").value) { acctStatus(a.error); upQ.focus(a.focus); return; }
-      answers = a.error ? null : a;
-    }
     const raw = $("acctEmail2").value.trim(), password = $("acctPass").value;
     if (!raw) { $("acctEmail2").focus(); return; }
     const email = authEmail(raw);
@@ -3092,9 +3083,9 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         await syncNow(true);
       } else {
         const j = await sbAuth("signup?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email, password });
-        if (j.access_token) { setSession(j); $("acctPass").value = ""; if (answers) { try { await saveAnswers(answers); upQ.clear(); } catch (e) {} } refreshRecStatus(); await syncNow(true); }
+        if (j.access_token) { setSession(j); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
         else {
-          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; if (answers) { try { await saveAnswers(answers); upQ.clear(); } catch (e) {} } refreshRecStatus(); await syncNow(true); }
+          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
           catch (e2) { setAcctMode("in"); acctStatus("Your account is made, but it isn't ready to sign in yet. Try signing in again in a moment."); }
         }
       }
@@ -3104,34 +3095,24 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   $("acctGo").addEventListener("click", acctSubmit);
   $("acctPass").addEventListener("keydown", e => { if (e.key === "Enter") acctSubmit(); });
   $("acctForgot").addEventListener("click", () => openReset(false));
-  $("acctRecRow").addEventListener("click", openRecSet);
+  $("acctRecRow").addEventListener("click", () => openRecSet(false));
+  $("setLater").addEventListener("click", () => $("recSetSheet").classList.remove("open"));
 
-  // ---- security questions: kids answer name, birthday and a parent's name; adults name, birthday and an email ----
-  function answerFields(pre) {
-    const kindBtns = $(pre + "Kind").querySelectorAll("button");
-    let kind = "kid";
-    const setKind = k => {
-      kind = k;
-      kindBtns.forEach(b => b.setAttribute("aria-selected", String(b.dataset.k === k)));
-      $(pre + "KidQ").hidden = k !== "kid"; $(pre + "Email").hidden = k !== "adult";
-    };
-    kindBtns.forEach(b => b.addEventListener("click", () => setKind(b.dataset.k)));
-    setKind("kid");
+  // ---- security questions for password help: birth state, favorite food, and a made-up secret word ----
+  function questionFields(pre) {
     const v = id => $(pre + id).value.trim();
     return {
-      setKind,
-      clear() { ["First", "Last", "Bday", "PFirst", "PLast", "Email"].forEach(id => $(pre + id).value = ""); },
+      clear() { ["State", "Food", "Secret"].forEach(id => $(pre + id).value = ""); },
       read() {
-        if (!v("First") || !v("Last")) return { error: "Enter a first and last name.", focus: v("First") ? "Last" : "First" };
-        if (!v("Bday")) return { error: "Enter a birthday.", focus: "Bday" };
-        if (kind === "kid" && (!v("PFirst") || !v("PLast"))) return { error: "Enter a parent's first and last name.", focus: v("PFirst") ? "PLast" : "PFirst" };
-        if (kind === "adult" && !/^\S+@\S+\.\S+$/.test(v("Email"))) return { error: "Enter an email address.", focus: "Email" };
-        return { kind, name: v("First") + " " + v("Last"), birthday: v("Bday"), extra: kind === "kid" ? v("PFirst") + " " + v("PLast") : v("Email") };
+        if (!v("State")) return { error: "Choose the state you were born in.", focus: "State" };
+        if (!v("Food")) return { error: "Enter your favorite food.", focus: "Food" };
+        if (v("Secret").length < 3) return { error: "Make up a secret word with at least 3 letters.", focus: "Secret" };
+        return { kind: "standard", name: v("State"), birthday: v("Food"), extra: v("Secret") };
       },
       focus(id) { $(pre + id).focus(); }
     };
   }
-  const upQ = answerFields("up"), recQ = answerFields("rec"), setQ = answerFields("set");
+  const recQ = questionFields("rec"), setQ = questionFields("set");
   async function rpc(fn, body, signedIn) {
     const headers = { apikey: SB_KEY, "Content-Type": "application/json" };
     if (signedIn) { const t = await getToken(); if (!t) throw { msg: "signed out" }; headers.Authorization = "Bearer " + t; }
@@ -3141,9 +3122,18 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
     return j;
   }
   const saveAnswers = a => rpc("set_recovery_answers", { p_kind: a.kind, p_name: a.name, p_birthday: a.birthday, p_extra: a.extra }, true);
+  // After 3 days with an account, Slate asks for the questions each time it opens until they're saved
   async function refreshRecStatus() {
-    if (!session) return;
-    try { const k = await rpc("has_recovery_answers", {}, true); $("acctRecVal").textContent = k ? "Set" : "Set up"; } catch (e) {}
+    if (!session) return null;
+    try { const k = await rpc("has_recovery_answers", {}, true); $("acctRecVal").textContent = k === "standard" ? "Set" : "Set up"; return k; } catch (e) { return undefined; }
+  }
+  async function maybeRequireQuestions() {
+    if (!CAN_SYNC || !session) return;
+    const age = Date.now() - Date.parse(session.created_at || "");
+    if (!(age >= 3 * 864e5)) return;
+    const k = await refreshRecStatus();
+    if (k === undefined || k === "standard") return;
+    openRecSet(true);
   }
   // 5 wrong passwords lock the account; answering the questions unlocks it
   function showLocked() {
@@ -3153,11 +3143,11 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   function openReset(locked) {
     $("recTitle").textContent = locked === true ? "Unlock your account" : "Reset your password";
     $("recHint").textContent = locked === true
-      ? "This account was locked after 5 wrong passwords. Answer your questions exactly as you did when you made it, then choose a new password."
-      : "Answer your questions exactly as you did when you made your account.";
+      ? "This account was locked after 5 wrong passwords. Answer your security questions, then choose a new password."
+      : "Answer your security questions, then choose a new password.";
     $("recUser").value = $("acctEmail2").value.trim(); recQ.clear(); $("recPw").value = ""; $("recStatus").textContent = ""; $("recStatus").classList.remove("ok");
     $("acctSheet").classList.remove("open"); $("recSheet").classList.add("open");
-    setTimeout(() => ($("recUser").value ? recQ.focus("First") : $("recUser").focus()), 300);
+    setTimeout(() => ($("recUser").value ? recQ.focus("State") : $("recUser").focus()), 300);
   }
   $("recGo").addEventListener("click", async () => {
     const st = (m, ok) => { $("recStatus").textContent = m; $("recStatus").classList.toggle("ok", !!ok); };
@@ -3175,12 +3165,16 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         syncNow(true);
       } else if (res === "locked") st("Too many wrong answers. Wait 15 minutes, then try again.");
       else if (res === "short") st("Choose a new password with at least 6 characters.");
-      else st("Those answers don't match what's on file. Check the spelling and the birthday, then try again.");
+      else st("Those answers don't match. Check the spelling and try again. If this account never set up its questions, it can't be reset this way.");
     } catch (e) { st(friendly(e)); }
     btn.disabled = false;
   });
-  function openRecSet() {
+  function openRecSet(required) {
     setQ.clear(); $("setStatus").textContent = ""; $("setStatus").classList.remove("ok");
+    $("setLater").textContent = required === true ? "Remind me next time" : "Cancel";
+    $("setHint").textContent = required === true
+      ? "You've used Slate for a few days, so it's time to set up your security questions. If you ever forget your password, you'll answer these to get back in."
+      : "If you ever forget your password, you'll answer these to get back in. Answers are scrambled, so nobody can read them, not even Slate.";
     $("acctSheet").classList.remove("open"); $("recSetSheet").classList.add("open");
   }
   $("setGo").addEventListener("click", async () => {
@@ -3225,7 +3219,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   }
   setAcctMode("in");
   updateAcctUI();
-  if (CAN_SYNC) { const fromLink = handleAuthLink(); if (session) syncNow(fromLink); }
+  if (CAN_SYNC) { const fromLink = handleAuthLink(); if (session) { syncNow(fromLink); setTimeout(maybeRequireQuestions, 4500); } }
 
   // ---------- boot ----------
   render(false);
