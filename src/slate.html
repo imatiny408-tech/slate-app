@@ -3209,6 +3209,7 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
   const acctSubmit = async () => {
     const raw = $("acctEmail2").value.trim(), password = $("acctPass").value;
     if (!raw) { $("acctEmail2").focus(); return; }
+    if (raw.includes("@")) { acctStatus("Just a username, no email. Use 3 to 20 letters or numbers, and . or _ if you like."); $("acctEmail2").focus(); return; }
     const email = acctMode === "in" ? await resolveLogin(raw) : authEmail(raw);
     if (!email) { acctStatus("Usernames are 3 to 20 letters or numbers, and can use . or _"); $("acctEmail2").focus(); return; }
     if (!password) { $("acctPass").focus(); return; }
