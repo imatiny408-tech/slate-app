@@ -3231,14 +3231,18 @@ button.stat.is-today span:first-child::after { content: " · Today"; color: var(
         await syncNow(true);
       } else {
         if (!raw.includes("@")) {
-          let free = true; try { free = await rpc("username_available", { p_username: raw }); } catch (e) {}
-          if (free === false) { acctStatus("That username is taken. Try another one."); btn.disabled = false; return; }
-        }
-        const j = await sbAuth("signup?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email, password });
-        if (j.access_token) { setSession(j); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
-        else {
-          try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
-          catch (e2) { setAcctMode("in"); acctStatus("Your account is made, but it isn't ready to sign in yet. Try signing in again in a moment."); }
+          // usernames: the account is made on the server with no email step, so there are no email limits or checks
+          let st; try { st = await rpc("create_username_account", { p_username: raw, p_password: password }); } catch (e) { throw e; }
+          const msg = { taken: "That username is taken. Try another one.", invalid: "Use 3 to 20 letters, numbers, dots or underscores for your username.", weak: "Use a password with at least 6 characters.", busy: "Slate is busy right now. Try again in a minute." }[st];
+          if (st !== "ok") { acctStatus(msg || "Something went wrong. Try again."); btn.disabled = false; return; }
+          setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; refreshRecStatus(); refreshUsername(false); await syncNow(true);
+        } else {
+          const j = await sbAuth("signup?redirect_to=" + encodeURIComponent(location.origin + location.pathname), { email, password });
+          if (j.access_token) { setSession(j); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
+          else {
+            try { setSession(await sbAuth("token?grant_type=password", { email, password })); $("acctPass").value = ""; refreshRecStatus(); await syncNow(true); }
+            catch (e2) { setAcctMode("in"); acctStatus("Your account is made, but it isn't ready to sign in yet. Try signing in again in a moment."); }
+          }
         }
       }
     } catch (e) { acctStatus(friendly(e)); }
